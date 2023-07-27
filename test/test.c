@@ -1,9 +1,9 @@
-#include <stdio.h>
-#include <string.h>
-
 #define UNARGS_PRINT_STR(str)
 #define UNARGS_PRINT_LN()
 #include "unargs.h"
+
+#include <stdio.h>
+#include <string.h>
 
 #define PRINT_TEST_FAIL() \
     fprintf(stderr, "Test failed: %s:%d %s\n", __FILE__, __LINE__, __func__)
