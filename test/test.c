@@ -6,7 +6,18 @@
     fprintf(stderr, "Test failed: %s:%d %s\n", __FILE__, __LINE__, __func__)
 
 int testBasic(void) {
-    if (unargs_parse() < 0) {
+    char *argv[] = {
+        "main",
+    };
+    int argc = sizeof(argv) / sizeof(*argv);
+
+    unargs_Param params[] = {
+        unargs_int("i", NULL),
+        unargs_string("str", NULL),
+    };
+
+    if (unargs_parse(argc, argv,
+            sizeof(params) / sizeof(*params), params) < 0) {
         PRINT_TEST_FAIL();
         return -1;
     }
