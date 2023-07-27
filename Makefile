@@ -35,3 +35,6 @@ $(BIN_DIR)/test_asan: unargs.h $(wildcard test/*)
 $(BIN_DIR)/test_msan: unargs.h $(wildcard test/*)
 	@mkdir -p $(@D)
 	$(CC) $(BUILD_FLAGS) -fsanitize=memory -fsanitize-memory-track-origins -fPIE -pie test/test.c -o $@
+
+clean:
+	rm -rf $(BIN_DIR)
