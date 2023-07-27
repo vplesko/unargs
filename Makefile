@@ -9,8 +9,29 @@ endif
 
 test: $(BIN_DIR)/tested.txt
 
-$(BIN_DIR)/tested.txt: unargs.h $(wildcard test/*)
-	@mkdir -p $(@D)
-	$(CC) $(BUILD_FLAGS) test/test.c -o $(BIN_DIR)/test
+# MSan and Valgrind don't work on Windows, so skip them in that case.
+TEST_MSAN_PATH =
+TEST_VALGRIND_CMD =
+ifndef WIN
+	TEST_MSAN_PATH = $(BIN_DIR)/test_msan
+	TEST_VALGRIND_CMD = valgrind -q --leak-check=yes $(BIN_DIR)/test
+endif
+
+$(BIN_DIR)/tested.txt: $(BIN_DIR)/test $(BIN_DIR)/test_asan $(TEST_MSAN_PATH)
 	$(BIN_DIR)/test
+	$(BIN_DIR)/test_asan
+	$(TEST_MSAN_PATH)
+	$(TEST_VALGRIND_CMD)
 	@touch $@
+
+$(BIN_DIR)/test: unargs.h $(wildcard test/*)
+	@mkdir -p $(@D)
+	$(CC) $(BUILD_FLAGS) test/test.c -o $@
+
+$(BIN_DIR)/test_asan: unargs.h $(wildcard test/*)
+	@mkdir -p $(@D)
+	$(CC) $(BUILD_FLAGS) -fsanitize=address,undefined test/test.c -o $@
+
+$(BIN_DIR)/test_msan: unargs.h $(wildcard test/*)
+	@mkdir -p $(@D)
+	$(CC) $(BUILD_FLAGS) -fsanitize=memory -fsanitize-memory-track-origins -fPIE -pie test/test.c -o $@
