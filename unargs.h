@@ -45,7 +45,8 @@ unargs_Param unargs_string(const char *name, const char **dst) {
     };
 }
 
-void unargs__verifyParams(size_t len, const unargs_Param *params) {
+void unargs__verifyParams(int len, const unargs_Param *params) {
+    assert(len >= 0);
     if (len > 0) assert(params != NULL);
 }
 
@@ -110,8 +111,8 @@ int unargs__parseVal(const char *arg, const unargs_Param *param) {
 
 int unargs__parseOpts(
     int argc, char * const *argv,
-    size_t len, const unargs_Param *params) {
-    for (size_t p = 0; p < len; ++p) {
+    int len, const unargs_Param *params) {
+    for (int p = 0; p < len; ++p) {
         bool found = false;
 
         for (int a = 1; a < argc; a += 2) {
@@ -140,7 +141,7 @@ int unargs__parseOpts(
 
 int unargs_parse(
     int argc, char * const *argv,
-    size_t len, const unargs_Param *params) {
+    int len, const unargs_Param *params) {
     unargs__verifyParams(len, params);
     unargs__verifyArgs(argc, argv);
 

@@ -8,13 +8,13 @@ int main(int argc, char *argv[]) {
         unargs_int("i", &i),
         unargs_string("str", &str),
     };
-    size_t paramsLen = sizeof(params) / sizeof(*params);
+    int paramsLen = sizeof(params) / sizeof(*params);
 
     if (unargs_parse( argc, argv, paramsLen, params) < 0) {
         return 1;
     }
 
-    for (size_t i = 0; i < paramsLen; ++i) {
+    for (int i = 0; i < paramsLen; ++i) {
         printf("%s: ", params[i]._name);
 
         if (params[i]._dst == NULL) {
