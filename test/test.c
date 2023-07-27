@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define UNARGS_PRINT_STR(str)
+#define UNARGS_PRINT_LN()
 #include "unargs.h"
 
 #define PRINT_TEST_FAIL() \
