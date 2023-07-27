@@ -36,11 +36,11 @@ unargs_Param unargs_string(const char *name, const char **dst) {
     };
 }
 
-int unargs_parse(
-    int argc, char * const *argv,
-    size_t len, const unargs_Param *params) {
+void unargs__verifyParams(size_t len, const unargs_Param *params) {
     if (len > 0) assert(params != NULL);
+}
 
+int unargs__verifyArgs(int argc, char * const *argv) {
     if (argc < 1) {
         fprintf(stderr, "@TODO\n");
         return -1;
@@ -59,6 +59,15 @@ int unargs_parse(
             return -1;
         }
     }
+
+    return 0;
+}
+
+int unargs_parse(
+    int argc, char * const *argv,
+    size_t len, const unargs_Param *params) {
+    unargs__verifyParams(len, params);
+    unargs__verifyArgs(argc, argv);
 
     return 0;
 }
