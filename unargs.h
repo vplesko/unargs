@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdio.h>
 #include <string.h>
 
 enum unargs__Type {
@@ -38,13 +39,26 @@ unargs_Param unargs_string(const char *name, const char **dst) {
 int unargs_parse(
     int argc, char * const *argv,
     size_t len, const unargs_Param *params) {
-    assert(argc >= 1);
-    assert(argv != NULL);
-    for (int i = 0; i < argc; ++i) {
-        assert(argv[i] != NULL);
-        assert(strlen(argv[i]) > 0);
-    }
     if (len > 0) assert(params != NULL);
+
+    if (argc < 1) {
+        fprintf(stderr, "@TODO\n");
+        return -1;
+    }
+    if (argv == NULL) {
+        fprintf(stderr, "@TODO\n");
+        return -1;
+    }
+    for (int i = 0; i < argc; ++i) {
+        if (argv[i] == NULL) {
+            fprintf(stderr, "@TODO\n");
+            return -1;
+        }
+        if (strlen(argv[i]) == 0) {
+            fprintf(stderr, "@TODO\n");
+            return -1;
+        }
+    }
 
     return 0;
 }
