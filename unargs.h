@@ -73,6 +73,7 @@ unargs_Param unargs_string(const char *name, const char **dst) {
     };
 }
 
+// @TODO create unargs__paramIsPos
 bool unargs__paramIsOpt(const unargs_Param *param) {
     return param->_name != NULL;
 }
@@ -81,11 +82,19 @@ void unargs__verifyParams(int len, const unargs_Param *params) {
     assert(len >= 0);
     if (len > 0) assert(params != NULL);
 
+    bool posNonReqFound = false;
     for (int i = 0; i < len; ++i) {
-        if (params[i]._name == NULL) continue;
+        if (!unargs__paramIsOpt(&params[i])) {
+            if (params[i]._req) assert(!posNonReqFound);
+            else posNonReqFound = true;
+        }
+    }
+
+    for (int i = 0; i < len; ++i) {
+        if (!unargs__paramIsOpt(&params[i])) continue;
 
         for (int j = i + 1; j < len; ++j) {
-            if (params[j]._name == NULL) continue;
+            if (!unargs__paramIsOpt(&params[j])) continue;
 
             assert(strcmp(params[i]._name, params[j]._name) != 0);
         }
@@ -128,7 +137,7 @@ const char* unargs__optName(const char *arg) {
 }
 
 bool unargs__optNameMatches(const char *arg, const unargs_Param *param) {
-    return param->_name != NULL && strcmp(arg + 1, param->_name) == 0;
+    return unargs__paramIsOpt(param) && strcmp(arg + 1, param->_name) == 0;
 }
 
 int unargs__parseVal(const char *arg, const unargs_Param *param) {
