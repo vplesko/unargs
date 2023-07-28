@@ -96,6 +96,7 @@ int testScrambled(void) {
     return 0;
 }
 
+// @TODO after optional, test that optional param names are unique even if not assigned
 int testBadArgs(void) {
     {
         char *argv[] = {
@@ -136,6 +137,24 @@ int testBadArgs(void) {
             "main",
             "-i", "123",
             "-i", "123",
+        };
+
+        unargs_Param params[] = {
+            unargs_int("i", NULL),
+        };
+
+        if (unargs_parse(
+                sizeof(argv) / sizeof(*argv), argv,
+                sizeof(params) / sizeof(*params), params) >= 0) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        char *argv[] = {
+            "main",
+            "-i", "123",
+            "-j", "123",
         };
 
         unargs_Param params[] = {

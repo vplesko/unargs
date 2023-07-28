@@ -21,6 +21,8 @@ typedef struct unargs_Param {
     enum unargs__Type _type;
 
     void *_dst;
+
+    bool _found;
 } unargs_Param;
 
 unargs_Param unargs_int(const char *name, int *dst) {
@@ -47,6 +49,7 @@ bool unargs__paramIsOpt(const unargs_Param *param) {
     return param->_name != NULL;
 }
 
+// @TODO verify that no two params have the same name
 void unargs__verifyParams(int len, const unargs_Param *params) {
     assert(len >= 0);
     if (len > 0) assert(params != NULL);
@@ -87,6 +90,10 @@ const char* unargs__optName(const char *arg) {
     return arg + 1;
 }
 
+bool unargs__optNameMatches(const char *arg, const unargs_Param *param) {
+    return param->_name != NULL && strcmp(arg + 1, param->_name) == 0;
+}
+
 int unargs__parseVal(const char *arg, const unargs_Param *param) {
     if (param->_type == unargs__TypeInt) {
         long l;
@@ -115,18 +122,24 @@ int unargs__parseVal(const char *arg, const unargs_Param *param) {
     return 0;
 }
 
-int unargs__parseOpts(
+int unargs__parseArgs(
     int argc, char * const *argv,
-    int len, const unargs_Param *params) {
+    int len, unargs_Param *params) {
     for (int p = 0; p < len; ++p) {
-        if (!unargs__paramIsOpt(&params[p])) continue;
+        params[p]._found = false;
+    }
 
-        bool found = false;
+    int nextPos = 0;
+    while (nextPos < len && unargs__paramIsOpt(&params[nextPos])) {
+        ++nextPos;
+    }
 
-        for (int a = 1; a < argc;) {
-            if (unargs__isOpt(argv[a])) {
-                if (strcmp(params[p]._name, unargs__optName(argv[a])) == 0) {
-                    if (found) {
+    for (int a = 1; a < argc;) {
+        if (unargs__isOpt(argv[a])) {
+            bool found = false;
+            for (int p = 0; p < len && !found; ++p) {
+                if (unargs__optNameMatches(argv[a], &params[p])) {
+                    if (params[p]._found) {
                         UNARGS_PRINT_STR("@TODO");
                         UNARGS_PRINT_LN();
                         return -1;
@@ -137,64 +150,49 @@ int unargs__parseOpts(
                         UNARGS_PRINT_LN();
                         return -1;
                     }
+
                     if (unargs__parseVal(argv[a + 1], &params[p]) < 0) {
                         return -1;
                     }
-
+                    params[p]._found = true;
                     found = true;
                 }
-
-                a += 2;
-            } else {
-                a += 1;
             }
-        }
 
-        if (!found) {
-            UNARGS_PRINT_STR("@TODO");
-            UNARGS_PRINT_LN();
-            return -1;
-        }
-    }
+            if (!found) {
+                UNARGS_PRINT_STR("@TODO");
+                UNARGS_PRINT_LN();
+                return -1;
+            }
 
-    return 0;
-}
-
-int unargs__parsePoss(
-    int argc, char * const *argv,
-    int len, const unargs_Param *params) {
-    int a = 1;
-    int p = 0;
-    while (a < argc && p < len) {
-        if (unargs__paramIsOpt(&params[p])) {
-            ++p;
-            continue;
-        }
-
-        if (unargs__isOpt(argv[a])) {
             a += 2;
         } else {
-            if (unargs__parseVal(argv[a], &params[p]) < 0) return -1;
-            ++p;
+            if (nextPos >= len) {
+                UNARGS_PRINT_STR("@TODO");
+                UNARGS_PRINT_LN();
+                return -1;
+            }
+
+            if (unargs__parseVal(argv[a], &params[nextPos]) < 0) {
+                return -1;
+            }
+            params[nextPos]._found = true;
+
+            ++nextPos;
+            while (nextPos < len && unargs__paramIsOpt(&params[nextPos])) {
+                ++nextPos;
+            }
 
             a += 1;
         }
     }
 
-    while (a < argc) {
-        if (unargs__isOpt(argv[a])) {
-            a += 2;
-        } else {
+    for (int p = 0; p < len; ++p) {
+        if (!params[p]._found) {
             UNARGS_PRINT_STR("@TODO");
             UNARGS_PRINT_LN();
             return -1;
         }
-    }
-
-    if (p < len) {
-        UNARGS_PRINT_STR("@TODO");
-        UNARGS_PRINT_LN();
-        return -1;
     }
 
     return 0;
@@ -202,12 +200,11 @@ int unargs__parsePoss(
 
 int unargs_parse(
     int argc, char * const *argv,
-    int len, const unargs_Param *params) {
+    int len, unargs_Param *params) {
     unargs__verifyParams(len, params);
     if (unargs__verifyArgs(argc, argv) < 0) return -1;
 
-    if (unargs__parseOpts(argc, argv, len, params) < 0) return -1;
-    if (unargs__parsePoss(argc, argv, len, params) < 0) return -1;
+    if (unargs__parseArgs(argc, argv, len, params) < 0) return -1;
 
     return 0;
 }
