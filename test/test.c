@@ -312,8 +312,8 @@ int testBadArgs(void) {
 }
 
 int main(void) {
-    // @TODO add testScrambled
     if (testBasic() != 0 ||
+        testScrambled() != 0 ||
         testBadArgs() != 0) {
         return -1;
     }
