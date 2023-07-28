@@ -13,21 +13,37 @@
 #define UNARGS_PRINT_LN() fprintf(stderr, "\n")
 #endif
 
+// @TODO bools
 enum unargs__Type {
     unargs__TypeInt,
     unargs__TypeString,
 };
 
-// @TODO default vals
 typedef struct unargs_Param {
     const char *_name;
     enum unargs__Type _type;
     bool _req;
+    union {
+        int i;
+        const char *str;
+    } _def;
 
     void *_dst;
 
     bool _found;
 } unargs_Param;
+
+unargs_Param unargs_int(const char *name, int def, int *dst) {
+    if (name != NULL) assert(strlen(name) > 0);
+
+    return (unargs_Param){
+        ._name = name,
+        ._type = unargs__TypeInt,
+        ._req = false,
+        ._def.i = def,
+        ._dst = dst,
+    };
+}
 
 unargs_Param unargs_intReq(const char *name, int *dst) {
     if (name != NULL) assert(strlen(name) > 0);
@@ -40,13 +56,15 @@ unargs_Param unargs_intReq(const char *name, int *dst) {
     };
 }
 
-unargs_Param unargs_int(const char *name, int *dst) {
+unargs_Param unargs_string(
+    const char *name, const char *def, const char **dst) {
     if (name != NULL) assert(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
-        ._type = unargs__TypeInt,
+        ._type = unargs__TypeString,
         ._req = false,
+        ._def.str = def,
         ._dst = dst,
     };
 }
@@ -58,17 +76,6 @@ unargs_Param unargs_stringReq(const char *name, const char **dst) {
         ._name = name,
         ._type = unargs__TypeString,
         ._req = true,
-        ._dst = dst,
-    };
-}
-
-unargs_Param unargs_string(const char *name, const char **dst) {
-    if (name != NULL) assert(strlen(name) > 0);
-
-    return (unargs_Param){
-        ._name = name,
-        ._type = unargs__TypeString,
-        ._req = false,
         ._dst = dst,
     };
 }
@@ -143,6 +150,16 @@ bool unargs__optNameMatches(const char *arg, const unargs_Param *param) {
     return unargs__paramIsOpt(param) && strcmp(arg + 1, param->_name) == 0;
 }
 
+void unargs__writeDef(unargs_Param *param) {
+    if (param->_type == unargs__TypeInt) {
+        if (param->_dst != NULL) *(int*)param->_dst = param->_def.i;
+    } else if (param->_type == unargs__TypeString) {
+        if (param->_dst != NULL) *(const char**)param->_dst = param->_def.str;
+    } else {
+        assert(false);
+    }
+}
+
 int unargs__parseVal(const char *arg, const unargs_Param *param) {
     if (param->_type == unargs__TypeInt) {
         long l;
@@ -176,6 +193,7 @@ int unargs__parseArgs(
     int len, unargs_Param *params) {
     for (int p = 0; p < len; ++p) {
         params[p]._found = false;
+        if (!params[p]._req) unargs__writeDef(&params[p]);
     }
 
     int nextPos = 0;

@@ -39,21 +39,21 @@ int testBasic(void) {
     int i;
     const char *str;
     const char *maybe;
-    const char *absent = "absent";
+    const char *absent;
     const char *pos0;
     const char *pos1;
-    const char *pos2 = "baz";
+    const char *pos2;
 
     unargs_Param params[] = {
         unargs_intReq("i", &i),
         unargs_stringReq("str", &str),
-        unargs_string("maybe", &maybe),
-        unargs_string("absent", &absent),
+        unargs_string("maybe", "", &maybe),
+        unargs_string("absent", "absent", &absent),
         unargs_stringReq(NULL, &pos0),
         unargs_stringReq("dummy", NULL),
         unargs_stringReq(NULL, NULL),
-        unargs_string(NULL, &pos1),
-        unargs_string(NULL, &pos2),
+        unargs_string(NULL, "", &pos1),
+        unargs_string(NULL, "baz", &pos2),
     };
 
     if (unargs_parse(
