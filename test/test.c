@@ -31,7 +31,7 @@ int testBasic(void) {
         "-str", "abc",
         "foo",
         "-dummy", "dummy",
-        "dummy",
+        "-",
     };
 
     int i;
