@@ -29,14 +29,21 @@ int testBasic(void) {
         "main",
         "-i", "123",
         "-str", "abc",
+        "foo",
+        "-dummy", "dummy",
+        "dummy",
     };
 
     int i;
     const char *str;
+    const char *posStr;
 
     unargs_Param params[] = {
         unargs_int("i", &i),
         unargs_string("str", &str),
+        unargs_string(NULL, &posStr),
+        unargs_string("dummy", NULL),
+        unargs_string(NULL, NULL),
     };
 
     if (unargs_parse(
@@ -48,6 +55,43 @@ int testBasic(void) {
 
     EXPECT_EQ(i, 123);
     EXPECT_STR_EQ(str, "abc");
+    EXPECT_STR_EQ(posStr, "foo");
+
+    return 0;
+}
+
+int testScrambled(void) {
+    char *argv[] = {
+        "main",
+        "-dummy", "dummy",
+        "-str", "abc",
+        "foo",
+        "dummy",
+        "-i", "123",
+    };
+
+    int i;
+    const char *str;
+    const char *posStr;
+
+    unargs_Param params[] = {
+        unargs_int("i", &i),
+        unargs_string("str", &str),
+        unargs_string(NULL, &posStr),
+        unargs_string("dummy", NULL),
+        unargs_string(NULL, NULL),
+    };
+
+    if (unargs_parse(
+            sizeof(argv) / sizeof(*argv), argv,
+            sizeof(params) / sizeof(*params), params) < 0) {
+        PRINT_TEST_FAIL();
+        return -1;
+    }
+
+    EXPECT_EQ(i, 123);
+    EXPECT_STR_EQ(str, "abc");
+    EXPECT_STR_EQ(posStr, "foo");
 
     return 0;
 }
@@ -108,10 +152,63 @@ int testBadArgs(void) {
     {
         char *argv[] = {
             "main",
+            "-i",
         };
 
         unargs_Param params[] = {
             unargs_int("i", NULL),
+        };
+
+        if (unargs_parse(
+                sizeof(argv) / sizeof(*argv), argv,
+                sizeof(params) / sizeof(*params), params) >= 0) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        char *argv[] = {
+            "main",
+        };
+
+        unargs_Param params[] = {
+            unargs_int("i", NULL),
+        };
+
+        if (unargs_parse(
+                sizeof(argv) / sizeof(*argv), argv,
+                sizeof(params) / sizeof(*params), params) >= 0) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        char *argv[] = {
+            "main",
+            "foo",
+            "bar",
+        };
+
+        unargs_Param params[] = {
+            unargs_string(NULL, NULL),
+        };
+
+        if (unargs_parse(
+                sizeof(argv) / sizeof(*argv), argv,
+                sizeof(params) / sizeof(*params), params) >= 0) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        char *argv[] = {
+            "main",
+            "foo",
+        };
+
+        unargs_Param params[] = {
+            unargs_string(NULL, NULL),
+            unargs_string(NULL, NULL),
         };
 
         if (unargs_parse(

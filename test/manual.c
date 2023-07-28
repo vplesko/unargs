@@ -3,18 +3,20 @@
 int main(int argc, char *argv[]) {
     int i;
     const char *str;
+    int x;
 
     unargs_Param params[] = {
         unargs_int("i", &i),
         unargs_string("str", &str),
+        unargs_int(NULL, &x),
     };
-    int paramsLen = sizeof(params) / sizeof(*params);
+    int len = sizeof(params) / sizeof(*params);
 
-    if (unargs_parse( argc, argv, paramsLen, params) < 0) {
+    if (unargs_parse(argc, argv, len, params) < 0) {
         return 1;
     }
 
-    for (int i = 0; i < paramsLen; ++i) {
+    for (int i = 0; i < len; ++i) {
         printf("%s: ", params[i]._name);
 
         if (params[i]._dst == NULL) {
