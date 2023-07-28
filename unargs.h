@@ -1,5 +1,6 @@
 // @TODO allow user to override assert and bool type
 // @TODO add string msgs to asserts
+// @TODO allow changing of function prefix
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -13,12 +14,14 @@
 #define UNARGS_PRINT_LN() fprintf(stderr, "\n")
 #endif
 
+// @TODO long type
 enum unargs__Type {
     unargs__TypeBool,
     unargs__TypeInt,
     unargs__TypeString,
 };
 
+// @TODO param descriptions
 typedef struct unargs_Param {
     const char *_name;
     enum unargs__Type _type;
@@ -292,6 +295,9 @@ int unargs__parseArgs(
     return 0;
 }
 
+// @TODO help text
+// @TODO add arg to allow ignoring some args errors
+// @TODO -- causes further options to be interpreted as pos
 int unargs_parse(
     int argc, char * const *argv,
     int len, unargs_Param *params) {
