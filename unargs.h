@@ -18,14 +18,27 @@ enum unargs__Type {
     unargs__TypeString,
 };
 
+// @TODO default vals
 typedef struct unargs_Param {
     const char *_name;
     enum unargs__Type _type;
+    bool _req;
 
     void *_dst;
 
     bool _found;
 } unargs_Param;
+
+unargs_Param unargs_intReq(const char *name, int *dst) {
+    if (name != NULL) assert(strlen(name) > 0);
+
+    return (unargs_Param){
+        ._name = name,
+        ._type = unargs__TypeInt,
+        ._req = true,
+        ._dst = dst,
+    };
+}
 
 unargs_Param unargs_int(const char *name, int *dst) {
     if (name != NULL) assert(strlen(name) > 0);
@@ -33,6 +46,18 @@ unargs_Param unargs_int(const char *name, int *dst) {
     return (unargs_Param){
         ._name = name,
         ._type = unargs__TypeInt,
+        ._req = false,
+        ._dst = dst,
+    };
+}
+
+unargs_Param unargs_stringReq(const char *name, const char **dst) {
+    if (name != NULL) assert(strlen(name) > 0);
+
+    return (unargs_Param){
+        ._name = name,
+        ._type = unargs__TypeString,
+        ._req = true,
         ._dst = dst,
     };
 }
@@ -43,6 +68,7 @@ unargs_Param unargs_string(const char *name, const char **dst) {
     return (unargs_Param){
         ._name = name,
         ._type = unargs__TypeString,
+        ._req = false,
         ._dst = dst,
     };
 }
@@ -199,7 +225,7 @@ int unargs__parseArgs(
     }
 
     for (int p = 0; p < len; ++p) {
-        if (!params[p]._found) {
+        if (params[p]._req && !params[p]._found) {
             UNARGS_PRINT_STR("@TODO");
             UNARGS_PRINT_LN();
             return -1;
@@ -209,6 +235,7 @@ int unargs__parseArgs(
     return 0;
 }
 
+// @TODO verify optional poss before required
 int unargs_parse(
     int argc, char * const *argv,
     int len, unargs_Param *params) {

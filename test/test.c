@@ -29,21 +29,31 @@ int testBasic(void) {
         "main",
         "-i", "123",
         "-str", "abc",
+        "-maybe", "maybe",
         "foo",
         "-dummy", "dummy",
         "-",
+        "bar",
     };
 
     int i;
     const char *str;
-    const char *posStr;
+    const char *maybe;
+    const char *absent = "absent";
+    const char *pos0;
+    const char *pos1;
+    const char *pos2 = "baz";
 
     unargs_Param params[] = {
-        unargs_int("i", &i),
-        unargs_string("str", &str),
-        unargs_string(NULL, &posStr),
-        unargs_string("dummy", NULL),
-        unargs_string(NULL, NULL),
+        unargs_intReq("i", &i),
+        unargs_stringReq("str", &str),
+        unargs_string("maybe", &maybe),
+        unargs_string("absent", &absent),
+        unargs_stringReq(NULL, &pos0),
+        unargs_stringReq("dummy", NULL),
+        unargs_stringReq(NULL, NULL),
+        unargs_string(NULL, &pos1),
+        unargs_string(NULL, &pos2),
     };
 
     if (unargs_parse(
@@ -55,7 +65,11 @@ int testBasic(void) {
 
     EXPECT_EQ(i, 123);
     EXPECT_STR_EQ(str, "abc");
-    EXPECT_STR_EQ(posStr, "foo");
+    EXPECT_STR_EQ(maybe, "maybe");
+    EXPECT_STR_EQ(absent, "absent");
+    EXPECT_STR_EQ(pos0, "foo");
+    EXPECT_STR_EQ(pos1, "bar");
+    EXPECT_STR_EQ(pos2, "baz");
 
     return 0;
 }
@@ -72,14 +86,14 @@ int testScrambled(void) {
 
     int i;
     const char *str;
-    const char *posStr;
+    const char *pos0;
 
     unargs_Param params[] = {
-        unargs_int("i", &i),
-        unargs_string("str", &str),
-        unargs_string(NULL, &posStr),
-        unargs_string("dummy", NULL),
-        unargs_string(NULL, NULL),
+        unargs_intReq("i", &i),
+        unargs_stringReq("str", &str),
+        unargs_stringReq(NULL, &pos0),
+        unargs_stringReq("dummy", NULL),
+        unargs_stringReq(NULL, NULL),
     };
 
     if (unargs_parse(
@@ -91,12 +105,11 @@ int testScrambled(void) {
 
     EXPECT_EQ(i, 123);
     EXPECT_STR_EQ(str, "abc");
-    EXPECT_STR_EQ(posStr, "foo");
+    EXPECT_STR_EQ(pos0, "foo");
 
     return 0;
 }
 
-// @TODO after optional, test that optional param names are unique even if not assigned
 int testBadArgs(void) {
     {
         char *argv[] = {
@@ -105,7 +118,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_int("i", NULL),
+            unargs_intReq("i", NULL),
         };
 
         if (unargs_parse(
@@ -122,7 +135,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_int("i", NULL),
+            unargs_intReq("i", NULL),
         };
 
         if (unargs_parse(
@@ -140,7 +153,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_int("i", NULL),
+            unargs_intReq("i", NULL),
         };
 
         if (unargs_parse(
@@ -158,7 +171,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_int("i", NULL),
+            unargs_intReq("i", NULL),
         };
 
         if (unargs_parse(
@@ -175,7 +188,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_int("i", NULL),
+            unargs_intReq("i", NULL),
         };
 
         if (unargs_parse(
@@ -191,7 +204,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_int("i", NULL),
+            unargs_intReq("i", NULL),
         };
 
         if (unargs_parse(
@@ -209,7 +222,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_string(NULL, NULL),
+            unargs_stringReq(NULL, NULL),
         };
 
         if (unargs_parse(
@@ -226,8 +239,8 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_string(NULL, NULL),
-            unargs_string(NULL, NULL),
+            unargs_stringReq(NULL, NULL),
+            unargs_stringReq(NULL, NULL),
         };
 
         if (unargs_parse(
@@ -244,7 +257,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_string(NULL, NULL),
+            unargs_stringReq(NULL, NULL),
         };
 
         if (unargs_parse(
@@ -256,7 +269,7 @@ int testBadArgs(void) {
     }
     {
         unargs_Param params[] = {
-            unargs_string(NULL, NULL),
+            unargs_stringReq(NULL, NULL),
         };
 
         if (unargs_parse(
@@ -273,7 +286,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_string(NULL, NULL),
+            unargs_stringReq(NULL, NULL),
         };
 
         if (unargs_parse(

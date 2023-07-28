@@ -1,14 +1,14 @@
 #include "unargs.h"
 
 int main(int argc, char *argv[]) {
-    int i;
-    const char *str;
-    int x;
+    const char *path;
+    int n, w, h;
 
     unargs_Param params[] = {
-        unargs_int("i", &i),
-        unargs_string("str", &str),
-        unargs_int(NULL, &x),
+        unargs_stringReq(NULL, &path),
+        unargs_intReq("n", &n),
+        unargs_intReq("w", &w),
+        unargs_intReq("h", &h),
     };
     int len = sizeof(params) / sizeof(*params);
 
