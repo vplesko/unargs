@@ -73,9 +73,12 @@ unargs_Param unargs_string(const char *name, const char **dst) {
     };
 }
 
-// @TODO create unargs__paramIsPos
 bool unargs__paramIsOpt(const unargs_Param *param) {
     return param->_name != NULL;
+}
+
+bool unargs__paramIsPos(const unargs_Param *param) {
+    return param->_name == NULL;
 }
 
 void unargs__verifyParams(int len, const unargs_Param *params) {
@@ -84,7 +87,7 @@ void unargs__verifyParams(int len, const unargs_Param *params) {
 
     bool posNonReqFound = false;
     for (int i = 0; i < len; ++i) {
-        if (!unargs__paramIsOpt(&params[i])) {
+        if (unargs__paramIsPos(&params[i])) {
             if (params[i]._req) assert(!posNonReqFound);
             else posNonReqFound = true;
         }
@@ -244,7 +247,6 @@ int unargs__parseArgs(
     return 0;
 }
 
-// @TODO verify optional poss before required
 int unargs_parse(
     int argc, char * const *argv,
     int len, unargs_Param *params) {
