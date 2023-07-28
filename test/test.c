@@ -218,6 +218,52 @@ int testBadArgs(void) {
             return -1;
         }
     }
+    {
+        char *argv[] = {
+            "main",
+            "foo",
+        };
+
+        unargs_Param params[] = {
+            unargs_string(NULL, NULL),
+        };
+
+        if (unargs_parse(
+                0, argv,
+                sizeof(params) / sizeof(*params), params) >= 0) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        unargs_Param params[] = {
+            unargs_string(NULL, NULL),
+        };
+
+        if (unargs_parse(
+                1, NULL,
+                sizeof(params) / sizeof(*params), params) >= 0) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        char *argv[] = {
+            "main",
+            "",
+        };
+
+        unargs_Param params[] = {
+            unargs_string(NULL, NULL),
+        };
+
+        if (unargs_parse(
+                sizeof(argv) / sizeof(*argv), argv,
+                sizeof(params) / sizeof(*params), params) >= 0) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
 
     return 0;
 }

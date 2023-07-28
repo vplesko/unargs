@@ -204,7 +204,7 @@ int unargs_parse(
     int argc, char * const *argv,
     int len, const unargs_Param *params) {
     unargs__verifyParams(len, params);
-    unargs__verifyArgs(argc, argv);
+    if (unargs__verifyArgs(argc, argv) < 0) return -1;
 
     if (unargs__parseOpts(argc, argv, len, params) < 0) return -1;
     if (unargs__parsePoss(argc, argv, len, params) < 0) return -1;
