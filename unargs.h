@@ -1,3 +1,5 @@
+// @TODO allow user to override assert and bool type
+// @TODO add string msgs to asserts
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -49,10 +51,19 @@ bool unargs__paramIsOpt(const unargs_Param *param) {
     return param->_name != NULL;
 }
 
-// @TODO verify that no two params have the same name
 void unargs__verifyParams(int len, const unargs_Param *params) {
     assert(len >= 0);
     if (len > 0) assert(params != NULL);
+
+    for (int i = 0; i < len; ++i) {
+        if (params[i]._name == NULL) continue;
+
+        for (int j = i + 1; j < len; ++j) {
+            if (params[j]._name == NULL) continue;
+
+            assert(strcmp(params[i]._name, params[j]._name) != 0);
+        }
+    }
 }
 
 int unargs__verifyArgs(int argc, char * const *argv) {
