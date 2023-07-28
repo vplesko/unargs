@@ -27,6 +27,7 @@
 int testBasic(void) {
     char *argv[] = {
         "main",
+        "-bt",
         "-i", "123",
         "-str", "abc",
         "-maybe", "maybe",
@@ -36,6 +37,8 @@ int testBasic(void) {
         "bar",
     };
 
+    bool bt;
+    bool bf;
     int i;
     const char *str;
     const char *maybe;
@@ -45,6 +48,8 @@ int testBasic(void) {
     const char *pos2;
 
     unargs_Param params[] = {
+        unargs_bool("bt", &bt),
+        unargs_bool("bf", &bf),
         unargs_intReq("i", &i),
         unargs_stringReq("str", &str),
         unargs_string("maybe", "", &maybe),
@@ -63,6 +68,8 @@ int testBasic(void) {
         return -1;
     }
 
+    EXPECT_EQ(bt, true);
+    EXPECT_EQ(bf, false);
     EXPECT_EQ(i, 123);
     EXPECT_STR_EQ(str, "abc");
     EXPECT_STR_EQ(maybe, "maybe");
@@ -78,17 +85,21 @@ int testScrambled(void) {
     char *argv[] = {
         "main",
         "-dummy", "dummy",
+        "-b",
         "-str", "abc",
         "foo",
         "dummy",
         "-i", "123",
     };
 
+    bool b;
     int i;
     const char *str;
     const char *pos0;
 
     unargs_Param params[] = {
+        unargs_bool("b", &b),
+        unargs_bool("begone", NULL),
         unargs_intReq("i", &i),
         unargs_stringReq("str", &str),
         unargs_stringReq(NULL, &pos0),
@@ -301,6 +312,7 @@ int testBadArgs(void) {
 }
 
 int main(void) {
+    // @TODO add testScrambled
     if (testBasic() != 0 ||
         testBadArgs() != 0) {
         return -1;
