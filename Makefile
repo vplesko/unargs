@@ -17,12 +17,12 @@ ifndef WIN
 	TEST_VALGRIND_CMD = valgrind -q --leak-check=yes $(BIN_DIR)/test
 endif
 
-$(BIN_DIR)/tested.txt: $(BIN_DIR)/test $(BIN_DIR)/test_asan $(TEST_MSAN_PATH) $(BIN_DIR)/test_multi $(BIN_DIR)/manual
+$(BIN_DIR)/tested.txt: $(BIN_DIR)/test $(BIN_DIR)/test_asan $(TEST_MSAN_PATH) $(BIN_DIR)/test_share $(BIN_DIR)/manual
 	$(BIN_DIR)/test
 	$(BIN_DIR)/test_asan
 	$(TEST_MSAN_PATH)
 	$(TEST_VALGRIND_CMD)
-	$(BIN_DIR)/test_multi
+	$(BIN_DIR)/test_share
 	@touch $@
 
 $(BIN_DIR)/test: unargs.h $(wildcard test/*)
@@ -37,9 +37,9 @@ $(BIN_DIR)/test_msan: unargs.h $(wildcard test/*)
 	@mkdir -p $(@D)
 	$(CC) $(BUILD_FLAGS) -fsanitize=memory -fsanitize-memory-track-origins -fPIE -pie test/test.c -o $@
 
-$(BIN_DIR)/test_multi: unargs.h $(wildcard test/*)
+$(BIN_DIR)/test_share: unargs.h $(wildcard test/*)
 	@mkdir -p $(@D)
-	$(CC) $(BUILD_FLAGS) test/test_multi1.c test/test_multi2.c -o $@
+	$(CC) $(BUILD_FLAGS) test/test_share1.c test/test_share2.c -o $@
 
 $(BIN_DIR)/manual: unargs.h $(wildcard test/*)
 	@mkdir -p $(@D)

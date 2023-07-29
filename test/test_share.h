@@ -1,5 +1,5 @@
-#ifndef INCLUDE_TEST_MULTI_H
-#define INCLUDE_TEST_MULTI_H
+#ifndef INCLUDE_TEST_SHARE_H
+#define INCLUDE_TEST_SHARE_H
 
 #include <stddef.h>
 
