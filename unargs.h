@@ -85,7 +85,7 @@ struct unargs_Param {
 
 #if !defined(UNARGS_ASSERT)
 #include <assert.h>
-#define UNARGS_ASSERT assert
+#define UNARGS_ASSERT(x) assert(x)
 #endif
 
 // @TODO ask to override all or none of these (out and err together)
