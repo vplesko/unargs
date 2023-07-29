@@ -87,12 +87,16 @@ int testTypes(void) {
         "-b",
         "-i", "1",
         "-l", "9223372036854775807",
+        "-f", "1.0",
+        "-d", "2.0",
         "-str", "foo",
     };
 
     bool b, bdef;
     int i, idef;
     long l, ldef;
+    float f, fdef;
+    double d, ddef;
     const char *str, *strdef;
 
     unargs_Param params[] = {
@@ -102,6 +106,10 @@ int testTypes(void) {
         unargs_int("idef", -1, &idef),
         unargs_longReq("l", &l),
         unargs_long("ldef", -9223372036854775807, &ldef),
+        unargs_floatReq("f", &f),
+        unargs_float("fdef", -1.0f, &fdef),
+        unargs_doubleReq("d", &d),
+        unargs_double("ddef", -2.0, &ddef),
         unargs_stringReq("str", &str),
         unargs_string("strdef", "bar", &strdef),
     };
@@ -119,6 +127,10 @@ int testTypes(void) {
     EXPECT_EQ(idef, -1);
     EXPECT_EQ(l, 9223372036854775807);
     EXPECT_EQ(ldef, -9223372036854775807);
+    EXPECT_EQ(f, 1.0f);
+    EXPECT_EQ(fdef, -1.0f);
+    EXPECT_EQ(d, 2.0);
+    EXPECT_EQ(ddef, -2.0);
     EXPECT_STR_EQ(str, "foo");
     EXPECT_STR_EQ(strdef, "bar");
 
