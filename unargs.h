@@ -164,149 +164,160 @@ unargs_Param unargs_bool(
     UNARGS_ASSERT(name != NULL);
     UNARGS_ASSERT(strlen(name) > 0);
 
-    return (unargs_Param){
-        ._name = name,
-        ._type = unargs__typeBool,
-        ._req = false,
-        ._desc = desc,
-        ._def.b = false,
-        ._dst = dst,
-    };
+    unargs_Param param;
+    param._name = name;
+    param._type = unargs__typeBool;
+    param._req = false;
+    param._desc = desc;
+    param._def.b = false;
+    param._dst = dst;
+
+    return param;
 }
 
 unargs_Param unargs_int(
     const char *name, const char *desc, int def, int *dst) {
     if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
-    return (unargs_Param){
-        ._name = name,
-        ._type = unargs__typeInt,
-        ._req = false,
-        ._desc = desc,
-        ._def.i = def,
-        ._dst = dst,
-    };
+    unargs_Param param;
+    param._name = name;
+    param._type = unargs__typeInt;
+    param._req = false;
+    param._desc = desc;
+    param._def.i = def;
+    param._dst = dst;
+
+    return param;
 }
 
 unargs_Param unargs_intReq(
     const char *name, const char *desc, int *dst) {
     if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
-    return (unargs_Param){
-        ._name = name,
-        ._type = unargs__typeInt,
-        ._req = true,
-        ._desc = desc,
-        ._dst = dst,
-    };
+    unargs_Param param;
+    param._name = name;
+    param._type = unargs__typeInt;
+    param._req = true;
+    param._desc = desc;
+    param._dst = dst;
+
+    return param;
 }
 
 unargs_Param unargs_long(
     const char *name, const char *desc, long def, long *dst) {
     if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
-    return (unargs_Param){
-        ._name = name,
-        ._type = unargs__typeLong,
-        ._req = false,
-        ._desc = desc,
-        ._def.l = def,
-        ._dst = dst,
-    };
+    unargs_Param param;
+    param._name = name;
+    param._type = unargs__typeLong;
+    param._req = false;
+    param._desc = desc;
+    param._def.l = def;
+    param._dst = dst;
+
+    return param;
 }
 
 unargs_Param unargs_longReq(
     const char *name, const char *desc, long *dst) {
     if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
-    return (unargs_Param){
-        ._name = name,
-        ._type = unargs__typeLong,
-        ._req = true,
-        ._desc = desc,
-        ._dst = dst,
-    };
+    unargs_Param param;
+    param._name = name;
+    param._type = unargs__typeLong;
+    param._req = true;
+    param._desc = desc;
+    param._dst = dst;
+
+    return param;
 }
 
 unargs_Param unargs_float(
     const char *name, const char *desc, float def, float *dst) {
     if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
-    return (unargs_Param){
-        ._name = name,
-        ._type = unargs__typeFloat,
-        ._req = false,
-        ._desc = desc,
-        ._def.f = def,
-        ._dst = dst,
-    };
+    unargs_Param param;
+    param._name = name;
+    param._type = unargs__typeFloat;
+    param._req = false;
+    param._desc = desc;
+    param._def.f = def;
+    param._dst = dst;
+
+    return param;
 }
 
 unargs_Param unargs_floatReq(
     const char *name, const char *desc, float *dst) {
     if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
-    return (unargs_Param){
-        ._name = name,
-        ._type = unargs__typeFloat,
-        ._req = true,
-        ._desc = desc,
-        ._dst = dst,
-    };
+    unargs_Param param;
+    param._name = name;
+    param._type = unargs__typeFloat;
+    param._req = true;
+    param._desc = desc;
+    param._dst = dst;
+
+    return param;
 }
 
 unargs_Param unargs_double(
     const char *name, const char *desc, double def, double *dst) {
     if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
-    return (unargs_Param){
-        ._name = name,
-        ._type = unargs__typeDouble,
-        ._req = false,
-        ._desc = desc,
-        ._def.d = def,
-        ._dst = dst,
-    };
+    unargs_Param param;
+    param._name = name;
+    param._type = unargs__typeDouble;
+    param._req = false;
+    param._desc = desc;
+    param._def.d = def;
+    param._dst = dst;
+
+    return param;
 }
 
 unargs_Param unargs_doubleReq(
     const char *name, const char *desc, double *dst) {
     if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
-    return (unargs_Param){
-        ._name = name,
-        ._type = unargs__typeDouble,
-        ._req = true,
-        ._desc = desc,
-        ._dst = dst,
-    };
+    unargs_Param param;
+    param._name = name;
+    param._type = unargs__typeDouble;
+    param._req = true;
+    param._desc = desc;
+    param._dst = dst;
+
+    return param;
 }
 
 unargs_Param unargs_string(
     const char *name, const char *desc, const char *def, const char **dst) {
     if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
-    return (unargs_Param){
-        ._name = name,
-        ._type = unargs__typeString,
-        ._req = false,
-        ._desc = desc,
-        ._def.str = def,
-        ._dst = dst,
-    };
+    unargs_Param param;
+    param._name = name;
+    param._type = unargs__typeString;
+    param._req = false;
+    param._desc = desc;
+    param._def.str = def;
+    param._dst = dst;
+
+    return param;
 }
 
 unargs_Param unargs_stringReq(
     const char *name, const char *desc, const char **dst) {
     if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
-    return (unargs_Param){
-        ._name = name,
-        ._type = unargs__typeString,
-        ._req = true,
-        ._desc = desc,
-        ._dst = dst,
-    };
+    unargs_Param param;
+    param._name = name;
+    param._type = unargs__typeString;
+    param._req = true;
+    param._desc = desc;
+    param._dst = dst;
+
+    return param;
 }
 
 bool unargs__paramIsOpt(const unargs_Param *param) {
