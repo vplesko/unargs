@@ -1,3 +1,6 @@
+// @TODO doc comments
+// @TODO add license
+
 #ifndef INCLUDE_UNARGS_H
 #define INCLUDE_UNARGS_H
 
@@ -88,7 +91,6 @@ struct unargs_Param {
 #define UNARGS_ASSERT(x) assert(x)
 #endif
 
-// @TODO ask to override all or none of these (out and err together)
 #if !defined(UNARGS_PRINT_OUT_INT)
 #include <stdio.h>
 #define UNARGS_PRINT_OUT_INT(x) fprintf(stdout, "%d", x)
