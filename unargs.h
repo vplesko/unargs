@@ -390,6 +390,26 @@ void unargs__writeDef(unargs_Param *param) {
     }
 }
 
+// When adding new types, update code wherever this comment appears.
+void unargs__printTypeOut(enum unargs__Type type) {
+    if (type == unargs__typeInt) UNARGS_PRINT_OUT_STR("<int>");
+    else if (type == unargs__typeLong) UNARGS_PRINT_OUT_STR("<long>");
+    else if (type == unargs__typeFloat) UNARGS_PRINT_OUT_STR("<float>");
+    else if (type == unargs__typeDouble) UNARGS_PRINT_OUT_STR("<double>");
+    else if (type == unargs__typeString) UNARGS_PRINT_OUT_STR("<string>");
+    else UNARGS_ASSERT(false);
+}
+
+// When adding new types, update code wherever this comment appears.
+void unargs__printTypeErr(enum unargs__Type type) {
+    if (type == unargs__typeInt) UNARGS_PRINT_ERR_STR("<int>");
+    else if (type == unargs__typeLong) UNARGS_PRINT_ERR_STR("<long>");
+    else if (type == unargs__typeFloat) UNARGS_PRINT_ERR_STR("<float>");
+    else if (type == unargs__typeDouble) UNARGS_PRINT_ERR_STR("<double>");
+    else if (type == unargs__typeString) UNARGS_PRINT_ERR_STR("<string>");
+    else UNARGS_ASSERT(false);
+}
+
 int unargs__parseLong(const char *str, long *l) {
     char *end;
     *l = strtol(str, &end, 0);
@@ -498,7 +518,9 @@ int unargs__parseArgs(
 
                     if (param->_found) {
                         unargs__printErrorPrefix();
-                        UNARGS_PRINT_ERR_STR("@TODO");
+                        UNARGS_PRINT_ERR_STR("Option '");
+                        UNARGS_PRINT_ERR_STR(param->_name);
+                        UNARGS_PRINT_ERR_STR("' provided more than once.");
                         UNARGS_PRINT_ERR_LN();
                         return -1;
                     }
@@ -508,7 +530,9 @@ int unargs__parseArgs(
                     } else {
                         if (a + 1 >= argc) {
                             unargs__printErrorPrefix();
-                            UNARGS_PRINT_ERR_STR("@TODO");
+                            UNARGS_PRINT_ERR_STR("Value not provided for '-");
+                            UNARGS_PRINT_ERR_STR(param->_name);
+                            UNARGS_PRINT_ERR_STR("'.");
                             UNARGS_PRINT_ERR_LN();
                             return -1;
                         }
@@ -524,7 +548,9 @@ int unargs__parseArgs(
 
             if (param == NULL) {
                 unargs__printErrorPrefix();
-                UNARGS_PRINT_ERR_STR("@TODO");
+                UNARGS_PRINT_ERR_STR("Found unknown option '-");
+                UNARGS_PRINT_ERR_STR(unargs__optName(argv[a]));
+                UNARGS_PRINT_ERR_STR("'.");
                 UNARGS_PRINT_ERR_LN();
                 return -1;
             }
@@ -533,7 +559,10 @@ int unargs__parseArgs(
         } else {
             if (nextPos >= len) {
                 unargs__printErrorPrefix();
-                UNARGS_PRINT_ERR_STR("@TODO");
+                UNARGS_PRINT_ERR_STR("Found too many positional arguments,");
+                UNARGS_PRINT_ERR_STR(" starting at '");
+                UNARGS_PRINT_ERR_STR(argv[a]);
+                UNARGS_PRINT_ERR_STR("'.");
                 UNARGS_PRINT_ERR_LN();
                 return -1;
             }
@@ -553,9 +582,20 @@ int unargs__parseArgs(
     }
 
     for (int p = 0; p < len; ++p) {
-        if (params[p]._req && !params[p]._found) {
+        const unargs_Param *param = &params[p];
+
+        if (param->_req && !param->_found) {
             unargs__printErrorPrefix();
-            UNARGS_PRINT_ERR_STR("@TODO");
+            if (unargs__paramIsOpt(param)) {
+                UNARGS_PRINT_ERR_STR("Required option '-");
+                UNARGS_PRINT_ERR_STR(param->_name);
+                UNARGS_PRINT_ERR_STR("' not given.");
+            } else {
+                UNARGS_PRINT_ERR_STR("Too few positional arguments provided.");
+                UNARGS_PRINT_ERR_STR(" Next one should be of type ");
+                unargs__printTypeErr(param->_type);
+                UNARGS_PRINT_ERR_STR(".");
+            }
             UNARGS_PRINT_ERR_LN();
             return -1;
         }
@@ -573,16 +613,6 @@ int unargs_parse(
     if (unargs__parseArgs(argc, argv, len, params) < 0) return -1;
 
     return 0;
-}
-
-// When adding new types, update code wherever this comment appears.
-void unargs__printType(enum unargs__Type type) {
-    if (type == unargs__typeInt) UNARGS_PRINT_OUT_STR("<int>");
-    else if (type == unargs__typeLong) UNARGS_PRINT_OUT_STR("<long>");
-    else if (type == unargs__typeFloat) UNARGS_PRINT_OUT_STR("<float>");
-    else if (type == unargs__typeDouble) UNARGS_PRINT_OUT_STR("<double>");
-    else if (type == unargs__typeString) UNARGS_PRINT_OUT_STR("<string>");
-    else UNARGS_ASSERT(false);
 }
 
 // When adding new types, update code wherever this comment appears.
@@ -613,7 +643,7 @@ void unargs__printUsage(
 
         if (unargs__paramIsPos(param) && param->_req) {
             UNARGS_PRINT_OUT_STR(" ");
-            unargs__printType(param->_type);
+            unargs__printTypeOut(param->_type);
         }
     }
 
@@ -624,7 +654,7 @@ void unargs__printUsage(
             UNARGS_PRINT_OUT_STR(" -");
             UNARGS_PRINT_OUT_STR(param->_name);
             UNARGS_PRINT_OUT_STR(" ");
-            unargs__printType(param->_type);
+            unargs__printTypeOut(param->_type);
         }
     }
 
@@ -698,7 +728,7 @@ void unargs__printPositionals(int len, const unargs_Param *params) {
         if (!unargs__paramIsPos(param)) continue;
 
         UNARGS_PRINT_OUT_TAB();
-        unargs__printType(param->_type);
+        unargs__printTypeOut(param->_type);
         UNARGS_PRINT_OUT_LN();
 
         unargs__printRequired(param);
@@ -728,7 +758,7 @@ void unargs__printOptions(int len, const unargs_Param *params) {
         UNARGS_PRINT_OUT_STR(param->_name);
         if (param->_type != unargs__typeBool) {
             UNARGS_PRINT_OUT_STR(" ");
-            unargs__printType(param->_type);
+            unargs__printTypeOut(param->_type);
         }
         UNARGS_PRINT_OUT_LN();
 
