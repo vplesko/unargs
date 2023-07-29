@@ -429,8 +429,6 @@ int unargs__parseArgs(
 }
 
 // @TODO help text
-// @TODO add arg to allow ignoring some args errors
-// @TODO -- causes further options to be interpreted as pos
 int unargs_parse(
     int argc, char * const *argv,
     int len, unargs_Param *params) {
