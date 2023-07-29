@@ -71,17 +71,17 @@ int testBasic(void) {
     const char *pos2;
 
     unargs_Param params[] = {
-        unargs_bool("bt", &bt),
-        unargs_bool("bf", &bf),
-        unargs_intReq("i", &i),
-        unargs_stringReq("str", &str),
-        unargs_string("maybe", "", &maybe),
-        unargs_string("absent", "absent", &absent),
-        unargs_stringReq(NULL, &pos0),
-        unargs_stringReq("dummy", NULL),
-        unargs_stringReq(NULL, NULL),
-        unargs_string(NULL, "", &pos1),
-        unargs_string(NULL, "baz", &pos2),
+        unargs_bool("bt", NULL, &bt),
+        unargs_bool("bf", NULL, &bf),
+        unargs_intReq("i", NULL, &i),
+        unargs_stringReq("str", NULL, &str),
+        unargs_string("maybe", NULL, "", &maybe),
+        unargs_string("absent", NULL, "absent", &absent),
+        unargs_stringReq(NULL, NULL, &pos0),
+        unargs_stringReq("dummy", NULL, NULL),
+        unargs_stringReq(NULL, NULL, NULL),
+        unargs_string(NULL, NULL, "", &pos1),
+        unargs_string(NULL, NULL, "baz", &pos2),
     };
 
     if (unargs_parse(
@@ -128,18 +128,18 @@ int testTypes(void) {
     const char *str, *strdef;
 
     unargs_Param params[] = {
-        unargs_bool("b", &b),
-        unargs_bool("bdef", &bdef),
-        unargs_intReq("i", &i),
-        unargs_int("idef", -1, &idef),
-        unargs_longReq("l", &l),
-        unargs_long("ldef", -9223372036854775807, &ldef),
-        unargs_floatReq("f", &f),
-        unargs_float("fdef", -1.0f, &fdef),
-        unargs_doubleReq("d", &d),
-        unargs_double("ddef", -2.0, &ddef),
-        unargs_stringReq("str", &str),
-        unargs_string("strdef", "bar", &strdef),
+        unargs_bool("b", NULL, &b),
+        unargs_bool("bdef", NULL, &bdef),
+        unargs_intReq("i", NULL, &i),
+        unargs_int("idef", NULL, -1, &idef),
+        unargs_longReq("l", NULL, &l),
+        unargs_long("ldef", NULL, -9223372036854775807, &ldef),
+        unargs_floatReq("f", NULL, &f),
+        unargs_float("fdef", NULL, -1.0f, &fdef),
+        unargs_doubleReq("d", NULL, &d),
+        unargs_double("ddef", NULL, -2.0, &ddef),
+        unargs_stringReq("str", NULL, &str),
+        unargs_string("strdef", NULL, "bar", &strdef),
     };
 
     if (unargs_parse(
@@ -172,28 +172,28 @@ int testHelp(void) {
 #define PREV_TEST testHelp
 
     unargs_Param params[] = {
-        unargs_bool("b", NULL),
-        unargs_intReq("i", NULL),
-        unargs_int("idef", 1, NULL),
-        unargs_longReq("l", NULL),
-        unargs_long("ldef", 1, NULL),
-        unargs_floatReq("f", NULL),
-        unargs_float("fdef", 0.0f, NULL),
-        unargs_doubleReq("d", NULL),
-        unargs_double("ddef", 0.0, NULL),
-        unargs_stringReq("str", NULL),
-        unargs_string("strdef", "1", NULL),
+        unargs_bool("b", NULL, NULL),
+        unargs_intReq("i", "desc", NULL),
+        unargs_int("idef", NULL, 1, NULL),
+        unargs_longReq("l", NULL, NULL),
+        unargs_long("ldef", "desc", 1, NULL),
+        unargs_floatReq("f", NULL, NULL),
+        unargs_float("fdef", NULL, 0.0f, NULL),
+        unargs_doubleReq("d", NULL, NULL),
+        unargs_double("ddef", NULL, 0.0, NULL),
+        unargs_stringReq("str", NULL, NULL),
+        unargs_string("strdef", NULL, "1", NULL),
 
-        unargs_intReq(NULL, NULL),
-        unargs_longReq(NULL, NULL),
-        unargs_floatReq(NULL, NULL),
-        unargs_doubleReq(NULL, NULL),
-        unargs_stringReq(NULL, NULL),
-        unargs_int(NULL, 1, NULL),
-        unargs_long(NULL, 1, NULL),
-        unargs_float(NULL, 0.0f, NULL),
-        unargs_double(NULL, 0.0, NULL),
-        unargs_string(NULL, "1", NULL),
+        unargs_intReq(NULL, NULL, NULL),
+        unargs_longReq(NULL, NULL, NULL),
+        unargs_floatReq(NULL, "desc", NULL),
+        unargs_doubleReq(NULL, NULL, NULL),
+        unargs_stringReq(NULL, NULL, NULL),
+        unargs_int(NULL, NULL, 1, NULL),
+        unargs_long(NULL, NULL, 1, NULL),
+        unargs_float(NULL, NULL, 0.0f, NULL),
+        unargs_double(NULL, "desc", 0.0, NULL),
+        unargs_string(NULL, NULL, "1", NULL),
     };
 
     unargs_help("test", sizeof(params) / sizeof(*params), params);
@@ -222,13 +222,13 @@ int testScrambled(void) {
     const char *pos0;
 
     unargs_Param params[] = {
-        unargs_bool("b", &b),
-        unargs_bool("begone", NULL),
-        unargs_intReq("i", &i),
-        unargs_stringReq("str", &str),
-        unargs_stringReq(NULL, &pos0),
-        unargs_stringReq("dummy", NULL),
-        unargs_stringReq(NULL, NULL),
+        unargs_bool("b", NULL, &b),
+        unargs_bool("begone", NULL, NULL),
+        unargs_intReq("i", NULL, &i),
+        unargs_stringReq("str", NULL, &str),
+        unargs_stringReq(NULL, NULL, &pos0),
+        unargs_stringReq("dummy", NULL, NULL),
+        unargs_stringReq(NULL, NULL, NULL),
     };
 
     if (unargs_parse(
@@ -257,7 +257,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_intReq("i", NULL),
+            unargs_intReq("i", NULL, NULL),
         };
 
         if (unargs_parse(
@@ -274,7 +274,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_intReq("i", NULL),
+            unargs_intReq("i", NULL, NULL),
         };
 
         if (unargs_parse(
@@ -292,7 +292,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_intReq("i", NULL),
+            unargs_intReq("i", NULL, NULL),
         };
 
         if (unargs_parse(
@@ -310,7 +310,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_intReq("i", NULL),
+            unargs_intReq("i", NULL, NULL),
         };
 
         if (unargs_parse(
@@ -327,7 +327,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_intReq("i", NULL),
+            unargs_intReq("i", NULL, NULL),
         };
 
         if (unargs_parse(
@@ -343,7 +343,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_intReq("i", NULL),
+            unargs_intReq("i", NULL, NULL),
         };
 
         if (unargs_parse(
@@ -361,7 +361,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_stringReq(NULL, NULL),
+            unargs_stringReq(NULL, NULL, NULL),
         };
 
         if (unargs_parse(
@@ -378,8 +378,8 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_stringReq(NULL, NULL),
-            unargs_stringReq(NULL, NULL),
+            unargs_stringReq(NULL, NULL, NULL),
+            unargs_stringReq(NULL, NULL, NULL),
         };
 
         if (unargs_parse(
@@ -396,7 +396,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_stringReq(NULL, NULL),
+            unargs_stringReq(NULL, NULL, NULL),
         };
 
         if (unargs_parse(
@@ -408,7 +408,7 @@ int testBadArgs(void) {
     }
     {
         unargs_Param params[] = {
-            unargs_stringReq(NULL, NULL),
+            unargs_stringReq(NULL, NULL, NULL),
         };
 
         if (unargs_parse(
@@ -425,7 +425,7 @@ int testBadArgs(void) {
         };
 
         unargs_Param params[] = {
-            unargs_stringReq(NULL, NULL),
+            unargs_stringReq(NULL, NULL, NULL),
         };
 
         if (unargs_parse(

@@ -90,11 +90,11 @@ enum unargs__Type {
     unargs__typeString,
 };
 
-// @TODO param descriptions
 typedef struct unargs_Param {
     const char *_name;
     enum unargs__Type _type;
     bool _req;
+    const char *_desc;
 
 // When adding new types, update code wherever this comment appears.
     union {
@@ -111,7 +111,8 @@ typedef struct unargs_Param {
     bool _found;
 } unargs_Param;
 
-unargs_Param unargs_bool(const char *name, bool *dst) {
+unargs_Param unargs_bool(
+    const char *name, const char *desc, bool *dst) {
     assert(name != NULL);
     assert(strlen(name) > 0);
 
@@ -119,6 +120,7 @@ unargs_Param unargs_bool(const char *name, bool *dst) {
         ._name = name,
         ._type = unargs__typeBool,
         ._req = false,
+        ._desc = desc,
         ._def.b = false,
         ._dst = dst,
     };
@@ -130,13 +132,15 @@ unargs_Param unargs_bool(const char *name, bool *dst) {
 //   type of def and dst arguments;
 //   value of _type;
 //   assignment to _def.X.)
-unargs_Param unargs_int(const char *name, int def, int *dst) {
+unargs_Param unargs_int(
+    const char *name, const char *desc, int def, int *dst) {
     if (name != NULL) assert(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
         ._type = unargs__typeInt,
         ._req = false,
+        ._desc = desc,
         ._def.i = def,
         ._dst = dst,
     };
@@ -147,106 +151,123 @@ unargs_Param unargs_int(const char *name, int def, int *dst) {
 //   function name;
 //   type of dst argument;
 //   value of _type.)
-unargs_Param unargs_intReq(const char *name, int *dst) {
+unargs_Param unargs_intReq(
+    const char *name, const char *desc, int *dst) {
     if (name != NULL) assert(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
         ._type = unargs__typeInt,
         ._req = true,
+        ._desc = desc,
         ._dst = dst,
     };
 }
 
-unargs_Param unargs_long(const char *name, long def, long *dst) {
+unargs_Param unargs_long(
+    const char *name, const char *desc, long def, long *dst) {
     if (name != NULL) assert(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
         ._type = unargs__typeLong,
         ._req = false,
+        ._desc = desc,
         ._def.l = def,
         ._dst = dst,
     };
 }
 
-unargs_Param unargs_longReq(const char *name, long *dst) {
+unargs_Param unargs_longReq(
+    const char *name, const char *desc, long *dst) {
     if (name != NULL) assert(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
         ._type = unargs__typeLong,
         ._req = true,
+        ._desc = desc,
         ._dst = dst,
     };
 }
 
-unargs_Param unargs_float(const char *name, float def, float *dst) {
+unargs_Param unargs_float(
+    const char *name, const char *desc, float def, float *dst) {
     if (name != NULL) assert(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
         ._type = unargs__typeFloat,
         ._req = false,
+        ._desc = desc,
         ._def.f = def,
         ._dst = dst,
     };
 }
 
-unargs_Param unargs_floatReq(const char *name, float *dst) {
+unargs_Param unargs_floatReq(
+    const char *name, const char *desc, float *dst) {
     if (name != NULL) assert(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
         ._type = unargs__typeFloat,
         ._req = true,
+        ._desc = desc,
         ._dst = dst,
     };
 }
 
-unargs_Param unargs_double(const char *name, double def, double *dst) {
+unargs_Param unargs_double(
+    const char *name, const char *desc, double def, double *dst) {
     if (name != NULL) assert(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
         ._type = unargs__typeDouble,
         ._req = false,
+        ._desc = desc,
         ._def.d = def,
         ._dst = dst,
     };
 }
 
-unargs_Param unargs_doubleReq(const char *name, double *dst) {
+unargs_Param unargs_doubleReq(
+    const char *name, const char *desc, double *dst) {
     if (name != NULL) assert(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
         ._type = unargs__typeDouble,
         ._req = true,
+        ._desc = desc,
         ._dst = dst,
     };
 }
 
 unargs_Param unargs_string(
-    const char *name, const char *def, const char **dst) {
+    const char *name, const char *desc, const char *def, const char **dst) {
     if (name != NULL) assert(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
         ._type = unargs__typeString,
         ._req = false,
+        ._desc = desc,
         ._def.str = def,
         ._dst = dst,
     };
 }
 
-unargs_Param unargs_stringReq(const char *name, const char **dst) {
+unargs_Param unargs_stringReq(
+    const char *name, const char *desc, const char **dst) {
     if (name != NULL) assert(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
         ._type = unargs__typeString,
         ._req = true,
+        ._desc = desc,
         ._dst = dst,
     };
 }
@@ -608,6 +629,15 @@ void unargs__printRequired(const unargs_Param *param) {
     }
 }
 
+void unargs__printDescription(const unargs_Param *param) {
+    if (param->_desc != NULL) {
+        UNARGS_PRINT_OUT_TAB();
+        UNARGS_PRINT_OUT_TAB();
+        UNARGS_PRINT_OUT_STR(param->_desc);
+        UNARGS_PRINT_OUT_LN();
+    }
+}
+
 void unargs__printDefault(const unargs_Param *param) {
     if (!param->_req && param->_type != unargs__typeBool) {
         UNARGS_PRINT_OUT_TAB();
@@ -639,6 +669,7 @@ void unargs__printPositionals(int len, const unargs_Param *params) {
         UNARGS_PRINT_OUT_LN();
 
         unargs__printRequired(param);
+        unargs__printDescription(param);
         unargs__printDefault(param);
     }
 }
@@ -669,11 +700,11 @@ void unargs__printOptions(int len, const unargs_Param *params) {
         UNARGS_PRINT_OUT_LN();
 
         unargs__printRequired(param);
+        unargs__printDescription(param);
         unargs__printDefault(param);
     }
 }
 
-// @TODO print defaults
 void unargs_help(const char *program, int len, const unargs_Param *params) {
     unargs__verifyParams(len, params);
 

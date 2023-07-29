@@ -8,19 +8,19 @@ int main(int argc, char *argv[]) {
     bool edge, edgeH, edgeV;
 
     unargs_Param params[] = {
-        unargs_stringReq(NULL, &path),
-        unargs_intReq("n", &n),
-        unargs_intReq("w", &w),
-        unargs_intReq("h", &h),
-        unargs_bool("flip", &flip),
-        unargs_bool("flipH", &flipH),
-        unargs_bool("flipV", &flipV),
-        unargs_bool("rot", &rot),
-        unargs_bool("rotH", &rotH),
-        unargs_bool("rotV", &rotV),
-        unargs_bool("edge", &edge),
-        unargs_bool("edgeH", &edgeH),
-        unargs_bool("edgeV", &edgeV),
+        unargs_stringReq(NULL, "Input image path.", &path),
+        unargs_intReq("n", "N parameter.", &n),
+        unargs_intReq("w", "Output width.", &w),
+        unargs_intReq("h", "Output height.", &h),
+        unargs_bool("flip", NULL, &flip),
+        unargs_bool("flipH", NULL, &flipH),
+        unargs_bool("flipV", NULL, &flipV),
+        unargs_bool("rot", NULL, &rot),
+        unargs_bool("rotH", NULL, &rotH),
+        unargs_bool("rotV", NULL, &rotV),
+        unargs_bool("edge", NULL, &edge),
+        unargs_bool("edgeH", NULL, &edgeH),
+        unargs_bool("edgeV", NULL, &edgeV),
     };
     int len = sizeof(params) / sizeof(*params);
 
