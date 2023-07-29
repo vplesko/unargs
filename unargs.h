@@ -7,11 +7,11 @@
 #include <string.h>
 
 // user should define all or none
-#if !defined(UNARGS_PRINT_STR) || !defined(UNARGS_PRINT_LN)
+#if !defined(UNARGS_PRINT_ERR_STR) || !defined(UNARGS_PRINT_ERR_LN)
 #include <stdio.h>
 
-#define UNARGS_PRINT_STR(str) fprintf(stderr, str)
-#define UNARGS_PRINT_LN() fprintf(stderr, "\n")
+#define UNARGS_PRINT_ERR_STR(str) fprintf(stderr, str)
+#define UNARGS_PRINT_ERR_LN() fprintf(stderr, "\n")
 #endif
 
 enum unargs__Type {
@@ -220,24 +220,24 @@ const char* unargs__optName(const char *arg) {
 
 int unargs__verifyArgs(int argc, char * const *argv) {
     if (argc < 1) {
-        UNARGS_PRINT_STR("@TODO");
-        UNARGS_PRINT_LN();
+        UNARGS_PRINT_ERR_STR("@TODO");
+        UNARGS_PRINT_ERR_LN();
         return -1;
     }
     if (argv == NULL) {
-        UNARGS_PRINT_STR("@TODO");
-        UNARGS_PRINT_LN();
+        UNARGS_PRINT_ERR_STR("@TODO");
+        UNARGS_PRINT_ERR_LN();
         return -1;
     }
     for (int i = 0; i < argc; ++i) {
         if (argv[i] == NULL) {
-            UNARGS_PRINT_STR("@TODO");
-            UNARGS_PRINT_LN();
+            UNARGS_PRINT_ERR_STR("@TODO");
+            UNARGS_PRINT_ERR_LN();
             return -1;
         }
         if (strlen(argv[i]) == 0) {
-            UNARGS_PRINT_STR("@TODO");
-            UNARGS_PRINT_LN();
+            UNARGS_PRINT_ERR_STR("@TODO");
+            UNARGS_PRINT_ERR_LN();
             return -1;
         }
     }
@@ -276,8 +276,8 @@ int unargs__parseLong(const char *str, long *l) {
     char *end;
     *l = strtol(str, &end, 0);
     if (*end != '\0') {
-        UNARGS_PRINT_STR("@TODO");
-        UNARGS_PRINT_LN();
+        UNARGS_PRINT_ERR_STR("@TODO");
+        UNARGS_PRINT_ERR_LN();
         return -1;
     }
 
@@ -288,8 +288,8 @@ int unargs__parseFloat(const char *str, float *f) {
     char *end;
     *f = strtof(str, &end);
     if (*end != '\0') {
-        UNARGS_PRINT_STR("@TODO");
-        UNARGS_PRINT_LN();
+        UNARGS_PRINT_ERR_STR("@TODO");
+        UNARGS_PRINT_ERR_LN();
         return -1;
     }
 
@@ -300,8 +300,8 @@ int unargs__parseDouble(const char *str, double *d) {
     char *end;
     *d = strtod(str, &end);
     if (*end != '\0') {
-        UNARGS_PRINT_STR("@TODO");
-        UNARGS_PRINT_LN();
+        UNARGS_PRINT_ERR_STR("@TODO");
+        UNARGS_PRINT_ERR_LN();
         return -1;
     }
 
@@ -315,8 +315,8 @@ int unargs__parseVal(const char *arg, const unargs_Param *param) {
 
         int i = (int)l;
         if (i != l) {
-            UNARGS_PRINT_STR("@TODO");
-            UNARGS_PRINT_LN();
+            UNARGS_PRINT_ERR_STR("@TODO");
+            UNARGS_PRINT_ERR_LN();
             return -1;
         }
 
@@ -366,8 +366,8 @@ int unargs__parseArgs(
                     param = &params[p];
 
                     if (param->_found) {
-                        UNARGS_PRINT_STR("@TODO");
-                        UNARGS_PRINT_LN();
+                        UNARGS_PRINT_ERR_STR("@TODO");
+                        UNARGS_PRINT_ERR_LN();
                         return -1;
                     }
 
@@ -375,8 +375,8 @@ int unargs__parseArgs(
                         if (param->_dst != NULL) *(bool*)param->_dst = true;
                     } else {
                         if (a + 1 >= argc) {
-                            UNARGS_PRINT_STR("@TODO");
-                            UNARGS_PRINT_LN();
+                            UNARGS_PRINT_ERR_STR("@TODO");
+                            UNARGS_PRINT_ERR_LN();
                             return -1;
                         }
 
@@ -390,16 +390,16 @@ int unargs__parseArgs(
             }
 
             if (param == NULL) {
-                UNARGS_PRINT_STR("@TODO");
-                UNARGS_PRINT_LN();
+                UNARGS_PRINT_ERR_STR("@TODO");
+                UNARGS_PRINT_ERR_LN();
                 return -1;
             }
 
             a += unargs__argCnt(param);
         } else {
             if (nextPos >= len) {
-                UNARGS_PRINT_STR("@TODO");
-                UNARGS_PRINT_LN();
+                UNARGS_PRINT_ERR_STR("@TODO");
+                UNARGS_PRINT_ERR_LN();
                 return -1;
             }
 
@@ -419,8 +419,8 @@ int unargs__parseArgs(
 
     for (int p = 0; p < len; ++p) {
         if (params[p]._req && !params[p]._found) {
-            UNARGS_PRINT_STR("@TODO");
-            UNARGS_PRINT_LN();
+            UNARGS_PRINT_ERR_STR("@TODO");
+            UNARGS_PRINT_ERR_LN();
             return -1;
         }
     }

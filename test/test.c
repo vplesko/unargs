@@ -1,5 +1,5 @@
-#define UNARGS_PRINT_STR(str)
-#define UNARGS_PRINT_LN()
+#define UNARGS_PRINT_ERR_STR(str)
+#define UNARGS_PRINT_ERR_LN()
 #include "unargs.h"
 
 #include <stdio.h>
