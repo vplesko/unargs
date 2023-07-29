@@ -1,10 +1,12 @@
-// @TODO allow user to override assert and bool type
-// @TODO add string msgs to asserts
 // @TODO allow changing of function prefix
-#include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+
+#if !defined(UNARGS_ASSERT)
+#include <assert.h>
+#define UNARGS_ASSERT assert
+#endif
 
 // When adding new types, update code wherever this comment appears.
 // (Add similar macros for the new types.)
@@ -113,8 +115,8 @@ typedef struct unargs_Param {
 
 unargs_Param unargs_bool(
     const char *name, const char *desc, bool *dst) {
-    assert(name != NULL);
-    assert(strlen(name) > 0);
+    UNARGS_ASSERT(name != NULL);
+    UNARGS_ASSERT(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
@@ -134,7 +136,7 @@ unargs_Param unargs_bool(
 //   assignment to _def.X.)
 unargs_Param unargs_int(
     const char *name, const char *desc, int def, int *dst) {
-    if (name != NULL) assert(strlen(name) > 0);
+    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
@@ -153,7 +155,7 @@ unargs_Param unargs_int(
 //   value of _type.)
 unargs_Param unargs_intReq(
     const char *name, const char *desc, int *dst) {
-    if (name != NULL) assert(strlen(name) > 0);
+    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
@@ -166,7 +168,7 @@ unargs_Param unargs_intReq(
 
 unargs_Param unargs_long(
     const char *name, const char *desc, long def, long *dst) {
-    if (name != NULL) assert(strlen(name) > 0);
+    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
@@ -180,7 +182,7 @@ unargs_Param unargs_long(
 
 unargs_Param unargs_longReq(
     const char *name, const char *desc, long *dst) {
-    if (name != NULL) assert(strlen(name) > 0);
+    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
@@ -193,7 +195,7 @@ unargs_Param unargs_longReq(
 
 unargs_Param unargs_float(
     const char *name, const char *desc, float def, float *dst) {
-    if (name != NULL) assert(strlen(name) > 0);
+    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
@@ -207,7 +209,7 @@ unargs_Param unargs_float(
 
 unargs_Param unargs_floatReq(
     const char *name, const char *desc, float *dst) {
-    if (name != NULL) assert(strlen(name) > 0);
+    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
@@ -220,7 +222,7 @@ unargs_Param unargs_floatReq(
 
 unargs_Param unargs_double(
     const char *name, const char *desc, double def, double *dst) {
-    if (name != NULL) assert(strlen(name) > 0);
+    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
@@ -234,7 +236,7 @@ unargs_Param unargs_double(
 
 unargs_Param unargs_doubleReq(
     const char *name, const char *desc, double *dst) {
-    if (name != NULL) assert(strlen(name) > 0);
+    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
@@ -247,7 +249,7 @@ unargs_Param unargs_doubleReq(
 
 unargs_Param unargs_string(
     const char *name, const char *desc, const char *def, const char **dst) {
-    if (name != NULL) assert(strlen(name) > 0);
+    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
@@ -261,7 +263,7 @@ unargs_Param unargs_string(
 
 unargs_Param unargs_stringReq(
     const char *name, const char *desc, const char **dst) {
-    if (name != NULL) assert(strlen(name) > 0);
+    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
@@ -281,13 +283,14 @@ bool unargs__paramIsPos(const unargs_Param *param) {
 }
 
 void unargs__verifyParams(int len, const unargs_Param *params) {
-    assert(len >= 0);
-    if (len > 0) assert(params != NULL);
+    UNARGS_ASSERT(len >= 0);
+    if (len > 0) UNARGS_ASSERT(params != NULL);
 
     bool posNonReqFound = false;
     for (int i = 0; i < len; ++i) {
         if (unargs__paramIsPos(&params[i])) {
-            if (params[i]._req) assert(!posNonReqFound);
+            // Required positionals must preceed non-required ones.
+            if (params[i]._req) UNARGS_ASSERT(!posNonReqFound);
             else posNonReqFound = true;
         }
     }
@@ -298,14 +301,16 @@ void unargs__verifyParams(int len, const unargs_Param *params) {
         for (int j = i + 1; j < len; ++j) {
             if (!unargs__paramIsOpt(&params[j])) continue;
 
-            assert(strcmp(params[i]._name, params[j]._name) != 0);
+            // Names of optionals must be unique.
+            UNARGS_ASSERT(strcmp(params[i]._name, params[j]._name) != 0);
         }
     }
 
     for (int i = 0; i < len; ++i) {
         for (int j = i + 1; j < len; ++j) {
             if (params[i]._dst != NULL && params[j]._dst != NULL) {
-                assert(params[i]._dst != params[j]._dst);
+                // Value destinations must be unique, unless null.
+                UNARGS_ASSERT(params[i]._dst != params[j]._dst);
             }
         }
     }
@@ -370,7 +375,7 @@ void unargs__writeDef(unargs_Param *param) {
     } else if (param->_type == unargs__typeString) {
         if (param->_dst != NULL) *(const char**)param->_dst = param->_def.str;
     } else {
-        assert(false);
+        UNARGS_ASSERT(false);
     }
 }
 
@@ -442,7 +447,7 @@ int unargs__parseVal(const char *arg, const unargs_Param *param) {
     } else if (param->_type == unargs__typeString) {
         if (param->_dst != NULL) *(const char**)param->_dst = arg;
     } else {
-        assert(false);
+        UNARGS_ASSERT(false);
     }
 
     return 0;
@@ -549,7 +554,7 @@ void unargs__printType(enum unargs__Type type) {
     else if (type == unargs__typeFloat) UNARGS_PRINT_OUT_STR("<float>");
     else if (type == unargs__typeDouble) UNARGS_PRINT_OUT_STR("<double>");
     else if (type == unargs__typeString) UNARGS_PRINT_OUT_STR("<string>");
-    else assert(false);
+    else UNARGS_ASSERT(false);
 }
 
 // When adding new types, update code wherever this comment appears.
@@ -565,7 +570,7 @@ void unargs__printDef(const unargs_Param *param) {
     } else if (param->_type == unargs__typeString) {
         UNARGS_PRINT_OUT_STR(param->_def.str);
     } else {
-        assert(false);
+        UNARGS_ASSERT(false);
     }
 }
 
