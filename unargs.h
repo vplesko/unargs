@@ -3,27 +3,80 @@
 // @TODO allow changing of function prefix
 #include <assert.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// @TODO change the API
-// If overriding, you should override all of these macros.
-#if !defined(UNARGS_PRINT_OUT_STR) || \
-    !defined(UNARGS_PRINT_OUT_TAB) || \
-    !defined(UNARGS_PRINT_OUT_LN)
-#define UNARGS_PRINT_OUT_STR(str) fprintf(stdout, "%s", str)
+// When adding new types, update code wherever this comment appears.
+// (Add similar macros for the new types.)
+#if !defined(UNARGS_PRINT_OUT_INT)
+#include <stdio.h>
+#define UNARGS_PRINT_OUT_INT(x) fprintf(stdout, "%d", x)
+#endif
+
+#if !defined(UNARGS_PRINT_OUT_LONG)
+#include <stdio.h>
+#define UNARGS_PRINT_OUT_LONG(x) fprintf(stdout, "%ld", x)
+#endif
+
+#if !defined(UNARGS_PRINT_OUT_FLOAT)
+#include <stdio.h>
+#define UNARGS_PRINT_OUT_FLOAT(x) fprintf(stdout, "%f", x)
+#endif
+
+#if !defined(UNARGS_PRINT_OUT_DOUBLE)
+#include <stdio.h>
+#define UNARGS_PRINT_OUT_DOUBLE(x) fprintf(stdout, "%f", x)
+#endif
+
+#if !defined(UNARGS_PRINT_OUT_STR)
+#include <stdio.h>
+#define UNARGS_PRINT_OUT_STR(x) fprintf(stdout, "%s", x)
+#endif
+
+#if !defined(UNARGS_PRINT_OUT_TAB)
+#include <stdio.h>
 #define UNARGS_PRINT_OUT_TAB() fprintf(stdout, "\t")
+#endif
+
+#if !defined(UNARGS_PRINT_OUT_LN)
+#include <stdio.h>
 #define UNARGS_PRINT_OUT_LN() fprintf(stdout, "\n")
 #endif
 
-// @TODO change the API
-// If overriding, you should override all of these macros.
-#if !defined(UNARGS_PRINT_ERR_STR) || \
-    !defined(UNARGS_PRINT_ERR_TAB) || \
-    !defined(UNARGS_PRINT_ERR_LN)
-#define UNARGS_PRINT_ERR_STR(str) fprintf(stderr, "%s", str)
+// When adding new types, update code wherever this comment appears.
+// (Add similar macros for the new types.)
+#if !defined(UNARGS_PRINT_ERR_INT)
+#include <stdio.h>
+#define UNARGS_PRINT_ERR_INT(x) fprintf(stderr, "%d", x)
+#endif
+
+#if !defined(UNARGS_PRINT_ERR_LONG)
+#include <stdio.h>
+#define UNARGS_PRINT_ERR_LONG(x) fprintf(stderr, "%ld", x)
+#endif
+
+#if !defined(UNARGS_PRINT_ERR_FLOAT)
+#include <stdio.h>
+#define UNARGS_PRINT_ERR_FLOAT(x) fprintf(stderr, "%f", x)
+#endif
+
+#if !defined(UNARGS_PRINT_ERR_DOUBLE)
+#include <stdio.h>
+#define UNARGS_PRINT_ERR_DOUBLE(x) fprintf(stderr, "%f", x)
+#endif
+
+#if !defined(UNARGS_PRINT_ERR_STR)
+#include <stdio.h>
+#define UNARGS_PRINT_ERR_STR(x) fprintf(stderr, "%s", x)
+#endif
+
+#if !defined(UNARGS_PRINT_ERR_TAB)
+#include <stdio.h>
 #define UNARGS_PRINT_ERR_TAB() fprintf(stderr, "\t")
+#endif
+
+#if !defined(UNARGS_PRINT_ERR_LN)
+#include <stdio.h>
 #define UNARGS_PRINT_ERR_LN() fprintf(stderr, "\n")
 #endif
 
@@ -480,30 +533,19 @@ void unargs__printType(enum unargs__Type type) {
 
 // When adding new types, update code wherever this comment appears.
 void unargs__printDef(const unargs_Param *param) {
-    if (param->_type == unargs__typeString) {
-        UNARGS_PRINT_OUT_STR(param->_def.str);
-        return;
-    }
-
-    char str[100];
-    int ret;
-
     if (param->_type == unargs__typeInt) {
-        ret = snprintf(str, sizeof(str), "%d", param->_def.i);
+        UNARGS_PRINT_OUT_INT(param->_def.i);
     } else if (param->_type == unargs__typeLong) {
-        ret = snprintf(str, sizeof(str), "%ld", param->_def.l);
+        UNARGS_PRINT_OUT_LONG(param->_def.l);
     } else if (param->_type == unargs__typeFloat) {
-        ret = snprintf(str, sizeof(str), "%f", param->_def.f);
+        UNARGS_PRINT_OUT_FLOAT(param->_def.f);
     } else if (param->_type == unargs__typeDouble) {
-        ret = snprintf(str, sizeof(str), "%f", param->_def.d);
+        UNARGS_PRINT_OUT_DOUBLE(param->_def.d);
+    } else if (param->_type == unargs__typeString) {
+        UNARGS_PRINT_OUT_STR(param->_def.str);
     } else {
         assert(false);
     }
-
-    assert(ret >= 0);
-    assert((size_t)ret + 1 <= sizeof(str));
-
-    UNARGS_PRINT_OUT_STR(str);
 }
 
 void unargs__printUsage(

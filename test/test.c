@@ -1,9 +1,19 @@
-#define UNARGS_PRINT_OUT_STR(str)
+#define UNARGS_PRINT_OUT_INT(x)
+#define UNARGS_PRINT_OUT_LONG(x)
+#define UNARGS_PRINT_OUT_FLOAT(x)
+#define UNARGS_PRINT_OUT_DOUBLE(x)
+#define UNARGS_PRINT_OUT_STR(x)
 #define UNARGS_PRINT_OUT_TAB()
 #define UNARGS_PRINT_OUT_LN()
-#define UNARGS_PRINT_ERR_STR(str)
+
+#define UNARGS_PRINT_ERR_INT(x)
+#define UNARGS_PRINT_ERR_LONG(x)
+#define UNARGS_PRINT_ERR_FLOAT(x)
+#define UNARGS_PRINT_ERR_DOUBLE(x)
+#define UNARGS_PRINT_ERR_STR(x)
 #define UNARGS_PRINT_ERR_TAB()
 #define UNARGS_PRINT_ERR_LN()
+
 #include "unargs.h"
 
 #include <stdio.h>
