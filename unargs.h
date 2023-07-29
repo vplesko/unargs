@@ -1,4 +1,78 @@
 #include <stdbool.h>
+
+typedef struct unargs_Param unargs_Param;
+
+unargs_Param unargs_bool(
+    const char *name, const char *desc, bool *dst);
+
+unargs_Param unargs_int(
+    const char *name, const char *desc, int def, int *dst);
+
+unargs_Param unargs_intReq(
+    const char *name, const char *desc, int *dst);
+
+unargs_Param unargs_long(
+    const char *name, const char *desc, long def, long *dst);
+
+unargs_Param unargs_longReq(
+    const char *name, const char *desc, long *dst);
+
+unargs_Param unargs_float(
+    const char *name, const char *desc, float def, float *dst);
+
+unargs_Param unargs_floatReq(
+    const char *name, const char *desc, float *dst);
+
+unargs_Param unargs_double(
+    const char *name, const char *desc, double def, double *dst);
+
+unargs_Param unargs_doubleReq(
+    const char *name, const char *desc, double *dst);
+
+unargs_Param unargs_string(
+    const char *name, const char *desc, const char *def, const char **dst);
+
+unargs_Param unargs_stringReq(
+    const char *name, const char *desc, const char **dst);
+
+int unargs_parse(
+    int argc, char * const *argv,
+    int len, unargs_Param *params);
+
+void unargs_help(const char *program, int len, const unargs_Param *params);
+
+// Below are implementation details.
+
+enum unargs__Type {
+    unargs__typeBool,
+    unargs__typeInt,
+    unargs__typeLong,
+    unargs__typeFloat,
+    unargs__typeDouble,
+    unargs__typeString,
+};
+
+struct unargs_Param {
+    const char *_name;
+    enum unargs__Type _type;
+    bool _req;
+    const char *_desc;
+    union {
+        bool b;
+        int i;
+        long l;
+        float f;
+        double d;
+        const char *str;
+    } _def;
+
+    void *_dst;
+
+    bool _found;
+};
+
+// IMPLEMENTATION
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -76,34 +150,6 @@
 #include <stdio.h>
 #define UNARGS_PRINT_ERR_LN() fprintf(stderr, "\n")
 #endif
-
-enum unargs__Type {
-    unargs__typeBool,
-    unargs__typeInt,
-    unargs__typeLong,
-    unargs__typeFloat,
-    unargs__typeDouble,
-    unargs__typeString,
-};
-
-typedef struct unargs_Param {
-    const char *_name;
-    enum unargs__Type _type;
-    bool _req;
-    const char *_desc;
-    union {
-        bool b;
-        int i;
-        long l;
-        float f;
-        double d;
-        const char *str;
-    } _def;
-
-    void *_dst;
-
-    bool _found;
-} unargs_Param;
 
 unargs_Param unargs_bool(
     const char *name, const char *desc, bool *dst) {
