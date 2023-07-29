@@ -7,13 +7,28 @@
 #include <string.h>
 
 // user should define all or none
-#if !defined(UNARGS_PRINT_ERR_STR) || !defined(UNARGS_PRINT_ERR_LN)
+#if !defined(UNARGS_PRINT_OUT_STR) || \
+    !defined(UNARGS_PRINT_OUT_TAB) || \
+    !defined(UNARGS_PRINT_OUT_LN)
 #include <stdio.h>
 
-#define UNARGS_PRINT_ERR_STR(str) fprintf(stderr, str)
+#define UNARGS_PRINT_OUT_STR(str) fprintf(stdout, "%s", str)
+#define UNARGS_PRINT_OUT_TAB() fprintf(stdout, "\t")
+#define UNARGS_PRINT_OUT_LN() fprintf(stdout, "\n")
+#endif
+
+// user should define all or none
+#if !defined(UNARGS_PRINT_ERR_STR) || \
+    !defined(UNARGS_PRINT_ERR_TAB) || \
+    !defined(UNARGS_PRINT_ERR_LN)
+#include <stdio.h>
+
+#define UNARGS_PRINT_ERR_STR(str) fprintf(stderr, "%s", str)
+#define UNARGS_PRINT_ERR_TAB() fprintf(stderr, "\t")
 #define UNARGS_PRINT_ERR_LN() fprintf(stderr, "\n")
 #endif
 
+// @TODO rename to unargs__typeBool (same for others)
 enum unargs__Type {
     unargs__TypeBool,
     unargs__TypeInt,
@@ -428,7 +443,6 @@ int unargs__parseArgs(
     return 0;
 }
 
-// @TODO help text
 int unargs_parse(
     int argc, char * const *argv,
     int len, unargs_Param *params) {
@@ -438,4 +452,135 @@ int unargs_parse(
     if (unargs__parseArgs(argc, argv, len, params) < 0) return -1;
 
     return 0;
+}
+
+void unargs__printType(enum unargs__Type type) {
+    if (type == unargs__TypeInt) UNARGS_PRINT_OUT_STR("<int>");
+    else if (type == unargs__TypeLong) UNARGS_PRINT_OUT_STR("<long>");
+    else if (type == unargs__TypeFloat) UNARGS_PRINT_OUT_STR("<float>");
+    else if (type == unargs__TypeDouble) UNARGS_PRINT_OUT_STR("<double>");
+    else if (type == unargs__TypeString) UNARGS_PRINT_OUT_STR("<string>");
+    else assert(false);
+}
+
+void unargs__printUsage(
+    const char *program, int len, const unargs_Param *params) {
+    UNARGS_PRINT_OUT_STR("Usage: ");
+
+    if (program != NULL) UNARGS_PRINT_OUT_STR(program);
+
+    for (int i = 0; i < len; ++i) {
+        const unargs_Param *param = &params[i];
+
+        if (unargs__paramIsPos(param) && param->_req) {
+            UNARGS_PRINT_OUT_STR(" ");
+            unargs__printType(param->_type);
+        }
+    }
+
+    for (int i = 0; i < len; ++i) {
+        const unargs_Param *param = &params[i];
+
+        if (unargs__paramIsOpt(param) && param->_req) {
+            UNARGS_PRINT_OUT_STR(" -");
+            UNARGS_PRINT_OUT_STR(param->_name);
+            UNARGS_PRINT_OUT_STR(" ");
+            unargs__printType(param->_type);
+        }
+    }
+
+    bool hasNonReqPos = false;
+    for (int i = 0; i < len; ++i) {
+        const unargs_Param *param = &params[i];
+
+        if (unargs__paramIsPos(param) && !param->_req) {
+            hasNonReqPos = true;
+            break;
+        }
+    }
+    if (hasNonReqPos) UNARGS_PRINT_OUT_STR(" [positionals]");
+
+    bool hasNonReqOpt = false;
+    for (int i = 0; i < len; ++i) {
+        const unargs_Param *param = &params[i];
+
+        if (unargs__paramIsOpt(param) && !param->_req) {
+            hasNonReqOpt = true;
+            break;
+        }
+    }
+    if (hasNonReqOpt) UNARGS_PRINT_OUT_STR(" [options]");
+
+    UNARGS_PRINT_OUT_LN();
+}
+
+void unargs__printRequired(const unargs_Param *param) {
+    if (param->_req) {
+        UNARGS_PRINT_OUT_TAB();
+        UNARGS_PRINT_OUT_TAB();
+        UNARGS_PRINT_OUT_STR("(required)");
+        UNARGS_PRINT_OUT_LN();
+    }
+}
+
+void unargs__printPositionals(int len, const unargs_Param *params) {
+    bool hasPos = false;
+    for (int i = 0; i < len; ++i) {
+        if (unargs__paramIsPos(&params[i])) {
+            hasPos = true;
+            break;
+        }
+    }
+    if (!hasPos) return;
+
+    UNARGS_PRINT_OUT_STR("Positionals:");
+    UNARGS_PRINT_OUT_LN();
+    for (int i = 0; i < len; ++i) {
+        const unargs_Param *param = &params[i];
+        if (!unargs__paramIsPos(param)) continue;
+
+        UNARGS_PRINT_OUT_TAB();
+        unargs__printType(param->_type);
+        UNARGS_PRINT_OUT_LN();
+
+        unargs__printRequired(param);
+    }
+}
+
+void unargs__printOptions(int len, const unargs_Param *params) {
+    bool hasOpt = false;
+    for (int i = 0; i < len; ++i) {
+        if (unargs__paramIsOpt(&params[i])) {
+            hasOpt = true;
+            break;
+        }
+    }
+    if (!hasOpt) return;
+
+    UNARGS_PRINT_OUT_STR("Options:");
+    UNARGS_PRINT_OUT_LN();
+    for (int i = 0; i < len; ++i) {
+        const unargs_Param *param = &params[i];
+        if (!unargs__paramIsOpt(param)) continue;
+
+        UNARGS_PRINT_OUT_TAB();
+        UNARGS_PRINT_OUT_STR("-");
+        UNARGS_PRINT_OUT_STR(param->_name);
+        if (param->_type != unargs__TypeBool) {
+            UNARGS_PRINT_OUT_STR(" ");
+            unargs__printType(param->_type);
+        }
+        UNARGS_PRINT_OUT_LN();
+
+        unargs__printRequired(param);
+    }
+}
+
+// @TODO print defaults
+void unargs_help(const char *program, int len, const unargs_Param *params) {
+    unargs__verifyParams(len, params);
+
+    unargs__printUsage(program, len, params);
+    unargs__printPositionals(len, params);
+    unargs__printOptions(len, params);
 }

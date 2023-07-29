@@ -1,4 +1,8 @@
+#define UNARGS_PRINT_OUT_STR(str)
+#define UNARGS_PRINT_OUT_TAB()
+#define UNARGS_PRINT_OUT_LN()
 #define UNARGS_PRINT_ERR_STR(str)
+#define UNARGS_PRINT_ERR_TAB()
 #define UNARGS_PRINT_ERR_LN()
 #include "unargs.h"
 
@@ -146,6 +150,41 @@ int testTypes(void) {
     EXPECT_EQ(ddef, -2.0);
     EXPECT_STR_EQ(str, "foo");
     EXPECT_STR_EQ(strdef, "bar");
+
+    return 0;
+}
+
+int testHelp(void) {
+    prevTest = PREV_TEST;
+#undef PREV_TEST
+#define PREV_TEST testHelp
+
+    unargs_Param params[] = {
+        unargs_bool("b", NULL),
+        unargs_intReq("i", NULL),
+        unargs_int("idef", 1, NULL),
+        unargs_longReq("l", NULL),
+        unargs_long("ldef", 1, NULL),
+        unargs_floatReq("f", NULL),
+        unargs_float("fdef", 0.0f, NULL),
+        unargs_doubleReq("d", NULL),
+        unargs_double("ddef", 0.0, NULL),
+        unargs_stringReq("str", NULL),
+        unargs_string("strdef", "1", NULL),
+
+        unargs_intReq(NULL, NULL),
+        unargs_longReq(NULL, NULL),
+        unargs_floatReq(NULL, NULL),
+        unargs_doubleReq(NULL, NULL),
+        unargs_stringReq(NULL, NULL),
+        unargs_int(NULL, 1, NULL),
+        unargs_long(NULL, 1, NULL),
+        unargs_float(NULL, 0.0f, NULL),
+        unargs_double(NULL, 0.0, NULL),
+        unargs_string(NULL, "1", NULL),
+    };
+
+    unargs_help("test", sizeof(params) / sizeof(*params), params);
 
     return 0;
 }
