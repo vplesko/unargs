@@ -1,3 +1,6 @@
+#ifndef INCLUDE_UNARGS_H
+#define INCLUDE_UNARGS_H
+
 #include <stdbool.h>
 
 typedef struct unargs_Param unargs_Param;
@@ -71,7 +74,11 @@ struct unargs_Param {
     bool _found;
 };
 
+#endif // INCLUDE_UNARGS_H
+
 // IMPLEMENTATION
+
+#ifdef UNARGS_IMPLEMENTATION
 
 #include <stdlib.h>
 #include <string.h>
@@ -798,3 +805,5 @@ void unargs_help(const char *program, int len, const unargs_Param *params) {
     unargs__printPositionals(len, params);
     unargs__printOptions(len, params);
 }
+
+#endif // UNARGS_IMPLEMENTATION

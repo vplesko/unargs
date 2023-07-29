@@ -14,6 +14,7 @@
 #define UNARGS_PRINT_ERR_TAB()
 #define UNARGS_PRINT_ERR_LN()
 
+#define UNARGS_IMPLEMENTATION
 #include "unargs.h"
 
 #include <stdio.h>

@@ -1,3 +1,4 @@
+#define UNARGS_IMPLEMENTATION
 #include "unargs.h"
 
 int main(int argc, char *argv[]) {
