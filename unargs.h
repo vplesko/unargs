@@ -14,10 +14,10 @@
 #define UNARGS_PRINT_LN() fprintf(stderr, "\n")
 #endif
 
-// @TODO long type
 enum unargs__Type {
     unargs__TypeBool,
     unargs__TypeInt,
+    unargs__TypeLong,
     unargs__TypeString,
 };
 
@@ -29,6 +29,7 @@ typedef struct unargs_Param {
     union {
         bool b;
         int i;
+        long l;
         const char *str;
     } _def;
 
@@ -73,6 +74,29 @@ unargs_Param unargs_intReq(const char *name, int *dst) {
     };
 }
 
+unargs_Param unargs_long(const char *name, long def, long *dst) {
+    if (name != NULL) assert(strlen(name) > 0);
+
+    return (unargs_Param){
+        ._name = name,
+        ._type = unargs__TypeLong,
+        ._req = false,
+        ._def.l = def,
+        ._dst = dst,
+    };
+}
+
+unargs_Param unargs_longReq(const char *name, long *dst) {
+    if (name != NULL) assert(strlen(name) > 0);
+
+    return (unargs_Param){
+        ._name = name,
+        ._type = unargs__TypeLong,
+        ._req = true,
+        ._dst = dst,
+    };
+}
+
 unargs_Param unargs_string(
     const char *name, const char *def, const char **dst) {
     if (name != NULL) assert(strlen(name) > 0);
@@ -105,6 +129,7 @@ bool unargs__paramIsPos(const unargs_Param *param) {
     return param->_name == NULL;
 }
 
+// @TODO verify dsts unique
 void unargs__verifyParams(int len, const unargs_Param *params) {
     assert(len >= 0);
     if (len > 0) assert(params != NULL);
@@ -177,6 +202,8 @@ void unargs__writeDef(unargs_Param *param) {
         if (param->_dst != NULL) *(bool*)param->_dst = param->_def.b;
     } else if (param->_type == unargs__TypeInt) {
         if (param->_dst != NULL) *(int*)param->_dst = param->_def.i;
+    } else if (param->_type == unargs__TypeLong) {
+        if (param->_dst != NULL) *(long*)param->_dst = param->_def.l;
     } else if (param->_type == unargs__TypeString) {
         if (param->_dst != NULL) *(const char**)param->_dst = param->_def.str;
     } else {
@@ -184,16 +211,22 @@ void unargs__writeDef(unargs_Param *param) {
     }
 }
 
+int unargs__parseLong(const char *str, long *l) {
+    char *end;
+    *l = strtol(str, &end, 0);
+    if (*end != '\0') {
+        UNARGS_PRINT_STR("@TODO");
+        UNARGS_PRINT_LN();
+        return -1;
+    }
+
+    return 0;
+}
+
 int unargs__parseVal(const char *arg, const unargs_Param *param) {
     if (param->_type == unargs__TypeInt) {
         long l;
-        char *end;
-        l = strtol(arg, &end, 0);
-        if (*end != '\0') {
-            UNARGS_PRINT_STR("@TODO");
-            UNARGS_PRINT_LN();
-            return -1;
-        }
+        if (unargs__parseLong(arg, &l) < 0) return -1;
 
         int i = (int)l;
         if (i != l) {
@@ -203,6 +236,11 @@ int unargs__parseVal(const char *arg, const unargs_Param *param) {
         }
 
         if (param->_dst != NULL) *(int*)param->_dst = i;
+    } else if (param->_type == unargs__TypeLong) {
+        long l;
+        if (unargs__parseLong(arg, &l) < 0) return -1;
+
+        if (param->_dst != NULL) *(long*)param->_dst = l;
     } else if (param->_type == unargs__TypeString) {
         if (param->_dst != NULL) *(const char**)param->_dst = arg;
     } else {

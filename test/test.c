@@ -81,6 +81,50 @@ int testBasic(void) {
     return 0;
 }
 
+int testTypes(void) {
+    char *argv[] = {
+        "main",
+        "-b",
+        "-i", "1",
+        "-l", "9223372036854775807",
+        "-str", "foo",
+    };
+
+    bool b, bdef;
+    int i, idef;
+    long l, ldef;
+    const char *str, *strdef;
+
+    unargs_Param params[] = {
+        unargs_bool("b", &b),
+        unargs_bool("bdef", &bdef),
+        unargs_intReq("i", &i),
+        unargs_int("idef", -1, &idef),
+        unargs_longReq("l", &l),
+        unargs_long("ldef", -9223372036854775807, &ldef),
+        unargs_stringReq("str", &str),
+        unargs_string("strdef", "bar", &strdef),
+    };
+
+    if (unargs_parse(
+            sizeof(argv) / sizeof(*argv), argv,
+            sizeof(params) / sizeof(*params), params) < 0) {
+        PRINT_TEST_FAIL();
+        return -1;
+    }
+
+    EXPECT_EQ(b, true);
+    EXPECT_EQ(bdef, false);
+    EXPECT_EQ(i, 1);
+    EXPECT_EQ(idef, -1);
+    EXPECT_EQ(l, 9223372036854775807);
+    EXPECT_EQ(ldef, -9223372036854775807);
+    EXPECT_STR_EQ(str, "foo");
+    EXPECT_STR_EQ(strdef, "bar");
+
+    return 0;
+}
+
 int testScrambled(void) {
     char *argv[] = {
         "main",
@@ -314,6 +358,7 @@ int testBadArgs(void) {
 int main(void) {
     if (testBasic() != 0 ||
         testScrambled() != 0 ||
+        testTypes() != 0 ||
         testBadArgs() != 0) {
         return -1;
     }
