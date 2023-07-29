@@ -395,7 +395,9 @@ int unargs__parseLong(const char *str, long *l) {
     *l = strtol(str, &end, 0);
     if (*end != '\0') {
         unargs__printErrorPrefix();
-        UNARGS_PRINT_ERR_STR("@TODO");
+        UNARGS_PRINT_ERR_STR("Could not parse integer value from '");
+        UNARGS_PRINT_ERR_STR(str);
+        UNARGS_PRINT_ERR_STR("'.");
         UNARGS_PRINT_ERR_LN();
         return -1;
     }
@@ -408,7 +410,9 @@ int unargs__parseFloat(const char *str, float *f) {
     *f = strtof(str, &end);
     if (*end != '\0') {
         unargs__printErrorPrefix();
-        UNARGS_PRINT_ERR_STR("@TODO");
+        UNARGS_PRINT_ERR_STR("Could not parse float value from '");
+        UNARGS_PRINT_ERR_STR(str);
+        UNARGS_PRINT_ERR_STR("'.");
         UNARGS_PRINT_ERR_LN();
         return -1;
     }
@@ -421,7 +425,9 @@ int unargs__parseDouble(const char *str, double *d) {
     *d = strtod(str, &end);
     if (*end != '\0') {
         unargs__printErrorPrefix();
-        UNARGS_PRINT_ERR_STR("@TODO");
+        UNARGS_PRINT_ERR_STR("Could not parse double value from '");
+        UNARGS_PRINT_ERR_STR(str);
+        UNARGS_PRINT_ERR_STR("'.");
         UNARGS_PRINT_ERR_LN();
         return -1;
     }
@@ -430,15 +436,17 @@ int unargs__parseDouble(const char *str, double *d) {
 }
 
 // When adding new types, update code wherever this comment appears.
-int unargs__parseVal(const char *arg, const unargs_Param *param) {
+int unargs__parseVal(const char *str, const unargs_Param *param) {
     if (param->_type == unargs__typeInt) {
         long l;
-        if (unargs__parseLong(arg, &l) < 0) return -1;
+        if (unargs__parseLong(str, &l) < 0) return -1;
 
         int i = (int)l;
         if (i != l) {
             unargs__printErrorPrefix();
-            UNARGS_PRINT_ERR_STR("@TODO");
+            UNARGS_PRINT_ERR_STR("Could not fit value ");
+            UNARGS_PRINT_ERR_STR(str);
+            UNARGS_PRINT_ERR_STR(" inside an int.");
             UNARGS_PRINT_ERR_LN();
             return -1;
         }
@@ -446,21 +454,21 @@ int unargs__parseVal(const char *arg, const unargs_Param *param) {
         if (param->_dst != NULL) *(int*)param->_dst = i;
     } else if (param->_type == unargs__typeLong) {
         long l;
-        if (unargs__parseLong(arg, &l) < 0) return -1;
+        if (unargs__parseLong(str, &l) < 0) return -1;
 
         if (param->_dst != NULL) *(long*)param->_dst = l;
     } else if (param->_type == unargs__typeFloat) {
         float f;
-        if (unargs__parseFloat(arg, &f) < 0) return -1;
+        if (unargs__parseFloat(str, &f) < 0) return -1;
 
         if (param->_dst != NULL) *(float*)param->_dst = f;
     } else if (param->_type == unargs__typeDouble) {
         double d;
-        if (unargs__parseDouble(arg, &d) < 0) return -1;
+        if (unargs__parseDouble(str, &d) < 0) return -1;
 
         if (param->_dst != NULL) *(double*)param->_dst = d;
     } else if (param->_type == unargs__typeString) {
-        if (param->_dst != NULL) *(const char**)param->_dst = arg;
+        if (param->_dst != NULL) *(const char**)param->_dst = str;
     } else {
         UNARGS_ASSERT(false);
     }
