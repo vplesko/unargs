@@ -330,26 +330,30 @@ const char* unargs__optName(const char *arg) {
 int unargs__verifyArgs(int argc, char * const *argv) {
     if (argc < 1) {
         unargs__printErrorPrefix();
-        UNARGS_PRINT_ERR_STR("@TODO");
+        UNARGS_PRINT_ERR_STR("At least one argument expected (program name).");
         UNARGS_PRINT_ERR_LN();
         return -1;
     }
     if (argv == NULL) {
         unargs__printErrorPrefix();
-        UNARGS_PRINT_ERR_STR("@TODO");
+        UNARGS_PRINT_ERR_STR("argv must not be null.");
         UNARGS_PRINT_ERR_LN();
         return -1;
     }
     for (int i = 0; i < argc; ++i) {
         if (argv[i] == NULL) {
             unargs__printErrorPrefix();
-            UNARGS_PRINT_ERR_STR("@TODO");
+            UNARGS_PRINT_ERR_STR("argv[");
+            UNARGS_PRINT_ERR_INT(i);
+            UNARGS_PRINT_ERR_STR("] is null.");
             UNARGS_PRINT_ERR_LN();
             return -1;
         }
         if (strlen(argv[i]) == 0) {
             unargs__printErrorPrefix();
-            UNARGS_PRINT_ERR_STR("@TODO");
+            UNARGS_PRINT_ERR_STR("argv[");
+            UNARGS_PRINT_ERR_INT(i);
+            UNARGS_PRINT_ERR_STR("] is empty.");
             UNARGS_PRINT_ERR_LN();
             return -1;
         }

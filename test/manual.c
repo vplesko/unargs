@@ -3,9 +3,7 @@
 int main(int argc, char *argv[]) {
     const char *path;
     int n, w, h;
-    bool flip, flipH, flipV;
-    bool rot, rotH, rotV;
-    bool edge, edgeH, edgeV;
+    bool flip, rot;
 
     unargs_Param params[] = {
         unargs_stringReq(NULL, "Input image path.", &path),
@@ -13,14 +11,7 @@ int main(int argc, char *argv[]) {
         unargs_intReq("w", "Output width.", &w),
         unargs_intReq("h", "Output height.", &h),
         unargs_bool("flip", NULL, &flip),
-        unargs_bool("flipH", NULL, &flipH),
-        unargs_bool("flipV", NULL, &flipV),
         unargs_bool("rot", NULL, &rot),
-        unargs_bool("rotH", NULL, &rotH),
-        unargs_bool("rotV", NULL, &rotV),
-        unargs_bool("edge", NULL, &edge),
-        unargs_bool("edgeH", NULL, &edgeH),
-        unargs_bool("edgeV", NULL, &edgeV),
     };
     int len = sizeof(params) / sizeof(*params);
 
