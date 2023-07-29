@@ -35,13 +35,13 @@ int main(int argc, char *argv[]) {
 
         if (params[i]._dst == NULL) {
             printf("NULL");
-        } else if (params[i]._type == unargs__TypeBool) {
+        } else if (params[i]._type == unargs__typeBool) {
             bool val = *(bool*)params[i]._dst;
             if (val) printf("true");
             else printf("false");
-        } else if (params[i]._type == unargs__TypeInt) {
+        } else if (params[i]._type == unargs__typeInt) {
             printf("%d", *(int*)params[i]._dst);
-        } else if (params[i]._type == unargs__TypeString) {
+        } else if (params[i]._type == unargs__typeString) {
             printf("\"%s\"", *(const char**)params[i]._dst);
         } else {
             assert(false);

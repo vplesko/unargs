@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// user should define all or none
+// If overriding, you should override all of these macros.
 #if !defined(UNARGS_PRINT_OUT_STR) || \
     !defined(UNARGS_PRINT_OUT_TAB) || \
     !defined(UNARGS_PRINT_OUT_LN)
@@ -17,7 +17,7 @@
 #define UNARGS_PRINT_OUT_LN() fprintf(stdout, "\n")
 #endif
 
-// user should define all or none
+// If overriding, you should override all of these macros.
 #if !defined(UNARGS_PRINT_ERR_STR) || \
     !defined(UNARGS_PRINT_ERR_TAB) || \
     !defined(UNARGS_PRINT_ERR_LN)
@@ -28,14 +28,14 @@
 #define UNARGS_PRINT_ERR_LN() fprintf(stderr, "\n")
 #endif
 
-// @TODO rename to unargs__typeBool (same for others)
+// When adding new types, update code wherever this comment appears.
 enum unargs__Type {
-    unargs__TypeBool,
-    unargs__TypeInt,
-    unargs__TypeLong,
-    unargs__TypeFloat,
-    unargs__TypeDouble,
-    unargs__TypeString,
+    unargs__typeBool,
+    unargs__typeInt,
+    unargs__typeLong,
+    unargs__typeFloat,
+    unargs__typeDouble,
+    unargs__typeString,
 };
 
 // @TODO param descriptions
@@ -43,6 +43,8 @@ typedef struct unargs_Param {
     const char *_name;
     enum unargs__Type _type;
     bool _req;
+
+// When adding new types, update code wherever this comment appears.
     union {
         bool b;
         int i;
@@ -63,31 +65,42 @@ unargs_Param unargs_bool(const char *name, bool *dst) {
 
     return (unargs_Param){
         ._name = name,
-        ._type = unargs__TypeBool,
+        ._type = unargs__typeBool,
         ._req = false,
         ._def.b = false,
         ._dst = dst,
     };
 }
 
+// When adding new types, update code wherever this comment appears.
+// (Add similar functions for the new types. Change:
+//   function name;
+//   type of def and dst arguments;
+//   value of _type;
+//   assignment to _def.X.)
 unargs_Param unargs_int(const char *name, int def, int *dst) {
     if (name != NULL) assert(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
-        ._type = unargs__TypeInt,
+        ._type = unargs__typeInt,
         ._req = false,
         ._def.i = def,
         ._dst = dst,
     };
 }
 
+// When adding new types, update code wherever this comment appears.
+// (Add similar functions for the new types. Change:
+//   function name;
+//   type of dst argument;
+//   value of _type.)
 unargs_Param unargs_intReq(const char *name, int *dst) {
     if (name != NULL) assert(strlen(name) > 0);
 
     return (unargs_Param){
         ._name = name,
-        ._type = unargs__TypeInt,
+        ._type = unargs__typeInt,
         ._req = true,
         ._dst = dst,
     };
@@ -98,7 +111,7 @@ unargs_Param unargs_long(const char *name, long def, long *dst) {
 
     return (unargs_Param){
         ._name = name,
-        ._type = unargs__TypeLong,
+        ._type = unargs__typeLong,
         ._req = false,
         ._def.l = def,
         ._dst = dst,
@@ -110,7 +123,7 @@ unargs_Param unargs_longReq(const char *name, long *dst) {
 
     return (unargs_Param){
         ._name = name,
-        ._type = unargs__TypeLong,
+        ._type = unargs__typeLong,
         ._req = true,
         ._dst = dst,
     };
@@ -121,7 +134,7 @@ unargs_Param unargs_float(const char *name, float def, float *dst) {
 
     return (unargs_Param){
         ._name = name,
-        ._type = unargs__TypeFloat,
+        ._type = unargs__typeFloat,
         ._req = false,
         ._def.f = def,
         ._dst = dst,
@@ -133,7 +146,7 @@ unargs_Param unargs_floatReq(const char *name, float *dst) {
 
     return (unargs_Param){
         ._name = name,
-        ._type = unargs__TypeFloat,
+        ._type = unargs__typeFloat,
         ._req = true,
         ._dst = dst,
     };
@@ -144,7 +157,7 @@ unargs_Param unargs_double(const char *name, double def, double *dst) {
 
     return (unargs_Param){
         ._name = name,
-        ._type = unargs__TypeDouble,
+        ._type = unargs__typeDouble,
         ._req = false,
         ._def.d = def,
         ._dst = dst,
@@ -156,7 +169,7 @@ unargs_Param unargs_doubleReq(const char *name, double *dst) {
 
     return (unargs_Param){
         ._name = name,
-        ._type = unargs__TypeDouble,
+        ._type = unargs__typeDouble,
         ._req = true,
         ._dst = dst,
     };
@@ -168,7 +181,7 @@ unargs_Param unargs_string(
 
     return (unargs_Param){
         ._name = name,
-        ._type = unargs__TypeString,
+        ._type = unargs__typeString,
         ._req = false,
         ._def.str = def,
         ._dst = dst,
@@ -180,7 +193,7 @@ unargs_Param unargs_stringReq(const char *name, const char **dst) {
 
     return (unargs_Param){
         ._name = name,
-        ._type = unargs__TypeString,
+        ._type = unargs__typeString,
         ._req = true,
         ._dst = dst,
     };
@@ -265,22 +278,23 @@ bool unargs__optNameMatches(const char *arg, const unargs_Param *param) {
 }
 
 int unargs__argCnt(const unargs_Param *param) {
-    if (unargs__paramIsOpt(param) && param->_type != unargs__TypeBool) return 2;
+    if (unargs__paramIsOpt(param) && param->_type != unargs__typeBool) return 2;
     return 1;
 }
 
+// When adding new types, update code wherever this comment appears.
 void unargs__writeDef(unargs_Param *param) {
-    if (param->_type == unargs__TypeBool) {
+    if (param->_type == unargs__typeBool) {
         if (param->_dst != NULL) *(bool*)param->_dst = param->_def.b;
-    } else if (param->_type == unargs__TypeInt) {
+    } else if (param->_type == unargs__typeInt) {
         if (param->_dst != NULL) *(int*)param->_dst = param->_def.i;
-    } else if (param->_type == unargs__TypeLong) {
+    } else if (param->_type == unargs__typeLong) {
         if (param->_dst != NULL) *(long*)param->_dst = param->_def.l;
-    } else if (param->_type == unargs__TypeFloat) {
+    } else if (param->_type == unargs__typeFloat) {
         if (param->_dst != NULL) *(float*)param->_dst = param->_def.f;
-    } else if (param->_type == unargs__TypeDouble) {
+    } else if (param->_type == unargs__typeDouble) {
         if (param->_dst != NULL) *(double*)param->_dst = param->_def.d;
-    } else if (param->_type == unargs__TypeString) {
+    } else if (param->_type == unargs__typeString) {
         if (param->_dst != NULL) *(const char**)param->_dst = param->_def.str;
     } else {
         assert(false);
@@ -323,8 +337,9 @@ int unargs__parseDouble(const char *str, double *d) {
     return 0;
 }
 
+// When adding new types, update code wherever this comment appears.
 int unargs__parseVal(const char *arg, const unargs_Param *param) {
-    if (param->_type == unargs__TypeInt) {
+    if (param->_type == unargs__typeInt) {
         long l;
         if (unargs__parseLong(arg, &l) < 0) return -1;
 
@@ -336,22 +351,22 @@ int unargs__parseVal(const char *arg, const unargs_Param *param) {
         }
 
         if (param->_dst != NULL) *(int*)param->_dst = i;
-    } else if (param->_type == unargs__TypeLong) {
+    } else if (param->_type == unargs__typeLong) {
         long l;
         if (unargs__parseLong(arg, &l) < 0) return -1;
 
         if (param->_dst != NULL) *(long*)param->_dst = l;
-    } else if (param->_type == unargs__TypeFloat) {
+    } else if (param->_type == unargs__typeFloat) {
         float f;
         if (unargs__parseFloat(arg, &f) < 0) return -1;
 
         if (param->_dst != NULL) *(float*)param->_dst = f;
-    } else if (param->_type == unargs__TypeDouble) {
+    } else if (param->_type == unargs__typeDouble) {
         double d;
         if (unargs__parseDouble(arg, &d) < 0) return -1;
 
         if (param->_dst != NULL) *(double*)param->_dst = d;
-    } else if (param->_type == unargs__TypeString) {
+    } else if (param->_type == unargs__typeString) {
         if (param->_dst != NULL) *(const char**)param->_dst = arg;
     } else {
         assert(false);
@@ -386,7 +401,7 @@ int unargs__parseArgs(
                         return -1;
                     }
 
-                    if (param->_type == unargs__TypeBool) {
+                    if (param->_type == unargs__typeBool) {
                         if (param->_dst != NULL) *(bool*)param->_dst = true;
                     } else {
                         if (a + 1 >= argc) {
@@ -454,12 +469,13 @@ int unargs_parse(
     return 0;
 }
 
+// When adding new types, update code wherever this comment appears.
 void unargs__printType(enum unargs__Type type) {
-    if (type == unargs__TypeInt) UNARGS_PRINT_OUT_STR("<int>");
-    else if (type == unargs__TypeLong) UNARGS_PRINT_OUT_STR("<long>");
-    else if (type == unargs__TypeFloat) UNARGS_PRINT_OUT_STR("<float>");
-    else if (type == unargs__TypeDouble) UNARGS_PRINT_OUT_STR("<double>");
-    else if (type == unargs__TypeString) UNARGS_PRINT_OUT_STR("<string>");
+    if (type == unargs__typeInt) UNARGS_PRINT_OUT_STR("<int>");
+    else if (type == unargs__typeLong) UNARGS_PRINT_OUT_STR("<long>");
+    else if (type == unargs__typeFloat) UNARGS_PRINT_OUT_STR("<float>");
+    else if (type == unargs__typeDouble) UNARGS_PRINT_OUT_STR("<double>");
+    else if (type == unargs__typeString) UNARGS_PRINT_OUT_STR("<string>");
     else assert(false);
 }
 
@@ -566,7 +582,7 @@ void unargs__printOptions(int len, const unargs_Param *params) {
         UNARGS_PRINT_OUT_TAB();
         UNARGS_PRINT_OUT_STR("-");
         UNARGS_PRINT_OUT_STR(param->_name);
-        if (param->_type != unargs__TypeBool) {
+        if (param->_type != unargs__typeBool) {
             UNARGS_PRINT_OUT_STR(" ");
             unargs__printType(param->_type);
         }
