@@ -151,6 +151,14 @@ void unargs__verifyParams(int len, const unargs_Param *params) {
             assert(strcmp(params[i]._name, params[j]._name) != 0);
         }
     }
+
+    for (int i = 0; i < len; ++i) {
+        for (int j = i + 1; j < len; ++j) {
+            if (params[i]._dst != NULL && params[j]._dst != NULL) {
+                assert(params[i]._dst != params[j]._dst);
+            }
+        }
+    }
 }
 
 bool unargs__isOpt(const char *arg) {
