@@ -7,8 +7,6 @@
 #define UNARGS_ASSERT assert
 #endif
 
-// When adding new types, update code wherever this comment appears.
-// (Add similar macros for the new types.)
 #if !defined(UNARGS_PRINT_OUT_INT)
 #include <stdio.h>
 #define UNARGS_PRINT_OUT_INT(x) fprintf(stdout, "%d", x)
@@ -44,8 +42,6 @@
 #define UNARGS_PRINT_OUT_LN() fprintf(stdout, "\n")
 #endif
 
-// When adding new types, update code wherever this comment appears.
-// (Add similar macros for the new types.)
 #if !defined(UNARGS_PRINT_ERR_INT)
 #include <stdio.h>
 #define UNARGS_PRINT_ERR_INT(x) fprintf(stderr, "%d", x)
@@ -81,7 +77,6 @@
 #define UNARGS_PRINT_ERR_LN() fprintf(stderr, "\n")
 #endif
 
-// When adding new types, update code wherever this comment appears.
 enum unargs__Type {
     unargs__typeBool,
     unargs__typeInt,
@@ -96,8 +91,6 @@ typedef struct unargs_Param {
     enum unargs__Type _type;
     bool _req;
     const char *_desc;
-
-// When adding new types, update code wherever this comment appears.
     union {
         bool b;
         int i;
@@ -127,12 +120,6 @@ unargs_Param unargs_bool(
     };
 }
 
-// When adding new types, update code wherever this comment appears.
-// (Add similar functions for the new types. Change:
-//   function name;
-//   type of def and dst arguments;
-//   value of _type;
-//   assignment to _def.X.)
 unargs_Param unargs_int(
     const char *name, const char *desc, int def, int *dst) {
     if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
@@ -147,11 +134,6 @@ unargs_Param unargs_int(
     };
 }
 
-// When adding new types, update code wherever this comment appears.
-// (Add similar functions for the new types. Change:
-//   function name;
-//   type of dst argument;
-//   value of _type.)
 unargs_Param unargs_intReq(
     const char *name, const char *desc, int *dst) {
     if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
@@ -371,7 +353,6 @@ int unargs__argCnt(const unargs_Param *param) {
     return 1;
 }
 
-// When adding new types, update code wherever this comment appears.
 void unargs__writeDef(unargs_Param *param) {
     if (param->_type == unargs__typeBool) {
         if (param->_dst != NULL) *(bool*)param->_dst = param->_def.b;
@@ -390,7 +371,6 @@ void unargs__writeDef(unargs_Param *param) {
     }
 }
 
-// When adding new types, update code wherever this comment appears.
 void unargs__printTypeOut(enum unargs__Type type) {
     if (type == unargs__typeInt) UNARGS_PRINT_OUT_STR("<int>");
     else if (type == unargs__typeLong) UNARGS_PRINT_OUT_STR("<long>");
@@ -400,7 +380,6 @@ void unargs__printTypeOut(enum unargs__Type type) {
     else UNARGS_ASSERT(false);
 }
 
-// When adding new types, update code wherever this comment appears.
 void unargs__printTypeErr(enum unargs__Type type) {
     if (type == unargs__typeInt) UNARGS_PRINT_ERR_STR("<int>");
     else if (type == unargs__typeLong) UNARGS_PRINT_ERR_STR("<long>");
@@ -455,7 +434,6 @@ int unargs__parseDouble(const char *str, double *d) {
     return 0;
 }
 
-// When adding new types, update code wherever this comment appears.
 int unargs__parseVal(const char *str, const unargs_Param *param) {
     if (param->_type == unargs__typeInt) {
         long l;
@@ -615,7 +593,6 @@ int unargs_parse(
     return 0;
 }
 
-// When adding new types, update code wherever this comment appears.
 void unargs__printDef(const unargs_Param *param) {
     if (param->_type == unargs__typeInt) {
         UNARGS_PRINT_OUT_INT(param->_def.i);
