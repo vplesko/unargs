@@ -94,6 +94,7 @@ int testBasic(void) {
     return 0;
 }
 
+// When adding new types, update code wherever this comment appears.
 int testTypes(void) {
     prevTest = PREV_TEST;
 #undef PREV_TEST
@@ -154,6 +155,7 @@ int testTypes(void) {
     return 0;
 }
 
+// When adding new types, update code wherever this comment appears.
 int testHelp(void) {
     prevTest = PREV_TEST;
 #undef PREV_TEST

@@ -3,26 +3,25 @@
 // @TODO allow changing of function prefix
 #include <assert.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+// @TODO change the API
 // If overriding, you should override all of these macros.
 #if !defined(UNARGS_PRINT_OUT_STR) || \
     !defined(UNARGS_PRINT_OUT_TAB) || \
     !defined(UNARGS_PRINT_OUT_LN)
-#include <stdio.h>
-
 #define UNARGS_PRINT_OUT_STR(str) fprintf(stdout, "%s", str)
 #define UNARGS_PRINT_OUT_TAB() fprintf(stdout, "\t")
 #define UNARGS_PRINT_OUT_LN() fprintf(stdout, "\n")
 #endif
 
+// @TODO change the API
 // If overriding, you should override all of these macros.
 #if !defined(UNARGS_PRINT_ERR_STR) || \
     !defined(UNARGS_PRINT_ERR_TAB) || \
     !defined(UNARGS_PRINT_ERR_LN)
-#include <stdio.h>
-
 #define UNARGS_PRINT_ERR_STR(str) fprintf(stderr, "%s", str)
 #define UNARGS_PRINT_ERR_TAB() fprintf(stderr, "\t")
 #define UNARGS_PRINT_ERR_LN() fprintf(stderr, "\n")
@@ -479,6 +478,34 @@ void unargs__printType(enum unargs__Type type) {
     else assert(false);
 }
 
+// When adding new types, update code wherever this comment appears.
+void unargs__printDef(const unargs_Param *param) {
+    if (param->_type == unargs__typeString) {
+        UNARGS_PRINT_OUT_STR(param->_def.str);
+        return;
+    }
+
+    char str[100];
+    int ret;
+
+    if (param->_type == unargs__typeInt) {
+        ret = snprintf(str, sizeof(str), "%d", param->_def.i);
+    } else if (param->_type == unargs__typeLong) {
+        ret = snprintf(str, sizeof(str), "%ld", param->_def.l);
+    } else if (param->_type == unargs__typeFloat) {
+        ret = snprintf(str, sizeof(str), "%f", param->_def.f);
+    } else if (param->_type == unargs__typeDouble) {
+        ret = snprintf(str, sizeof(str), "%f", param->_def.d);
+    } else {
+        assert(false);
+    }
+
+    assert(ret >= 0);
+    assert((size_t)ret + 1 <= sizeof(str));
+
+    UNARGS_PRINT_OUT_STR(str);
+}
+
 void unargs__printUsage(
     const char *program, int len, const unargs_Param *params) {
     UNARGS_PRINT_OUT_STR("Usage: ");
@@ -539,6 +566,16 @@ void unargs__printRequired(const unargs_Param *param) {
     }
 }
 
+void unargs__printDefault(const unargs_Param *param) {
+    if (!param->_req && param->_type != unargs__typeBool) {
+        UNARGS_PRINT_OUT_TAB();
+        UNARGS_PRINT_OUT_TAB();
+        UNARGS_PRINT_OUT_STR("Default: ");
+        unargs__printDef(param);
+        UNARGS_PRINT_OUT_LN();
+    }
+}
+
 void unargs__printPositionals(int len, const unargs_Param *params) {
     bool hasPos = false;
     for (int i = 0; i < len; ++i) {
@@ -560,6 +597,7 @@ void unargs__printPositionals(int len, const unargs_Param *params) {
         UNARGS_PRINT_OUT_LN();
 
         unargs__printRequired(param);
+        unargs__printDefault(param);
     }
 }
 
@@ -589,6 +627,7 @@ void unargs__printOptions(int len, const unargs_Param *params) {
         UNARGS_PRINT_OUT_LN();
 
         unargs__printRequired(param);
+        unargs__printDefault(param);
     }
 }
 
