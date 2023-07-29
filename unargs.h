@@ -78,7 +78,7 @@ enum unargs__Type {
     unargs__typeLong,
     unargs__typeFloat,
     unargs__typeDouble,
-    unargs__typeString,
+    unargs__typeString
 };
 
 struct unargs_Param {
