@@ -1,4 +1,3 @@
-// @TODO allow changing of function prefix
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -282,6 +281,10 @@ bool unargs__paramIsPos(const unargs_Param *param) {
     return param->_name == NULL;
 }
 
+void unargs__printErrorPrefix(void) {
+    UNARGS_PRINT_ERR_STR("Error: ");
+}
+
 void unargs__verifyParams(int len, const unargs_Param *params) {
     UNARGS_ASSERT(len >= 0);
     if (len > 0) UNARGS_ASSERT(params != NULL);
@@ -326,22 +329,26 @@ const char* unargs__optName(const char *arg) {
 
 int unargs__verifyArgs(int argc, char * const *argv) {
     if (argc < 1) {
+        unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR("@TODO");
         UNARGS_PRINT_ERR_LN();
         return -1;
     }
     if (argv == NULL) {
+        unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR("@TODO");
         UNARGS_PRINT_ERR_LN();
         return -1;
     }
     for (int i = 0; i < argc; ++i) {
         if (argv[i] == NULL) {
+            unargs__printErrorPrefix();
             UNARGS_PRINT_ERR_STR("@TODO");
             UNARGS_PRINT_ERR_LN();
             return -1;
         }
         if (strlen(argv[i]) == 0) {
+            unargs__printErrorPrefix();
             UNARGS_PRINT_ERR_STR("@TODO");
             UNARGS_PRINT_ERR_LN();
             return -1;
@@ -383,6 +390,7 @@ int unargs__parseLong(const char *str, long *l) {
     char *end;
     *l = strtol(str, &end, 0);
     if (*end != '\0') {
+        unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR("@TODO");
         UNARGS_PRINT_ERR_LN();
         return -1;
@@ -395,6 +403,7 @@ int unargs__parseFloat(const char *str, float *f) {
     char *end;
     *f = strtof(str, &end);
     if (*end != '\0') {
+        unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR("@TODO");
         UNARGS_PRINT_ERR_LN();
         return -1;
@@ -407,6 +416,7 @@ int unargs__parseDouble(const char *str, double *d) {
     char *end;
     *d = strtod(str, &end);
     if (*end != '\0') {
+        unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR("@TODO");
         UNARGS_PRINT_ERR_LN();
         return -1;
@@ -423,6 +433,7 @@ int unargs__parseVal(const char *arg, const unargs_Param *param) {
 
         int i = (int)l;
         if (i != l) {
+            unargs__printErrorPrefix();
             UNARGS_PRINT_ERR_STR("@TODO");
             UNARGS_PRINT_ERR_LN();
             return -1;
@@ -474,6 +485,7 @@ int unargs__parseArgs(
                     param = &params[p];
 
                     if (param->_found) {
+                        unargs__printErrorPrefix();
                         UNARGS_PRINT_ERR_STR("@TODO");
                         UNARGS_PRINT_ERR_LN();
                         return -1;
@@ -483,6 +495,7 @@ int unargs__parseArgs(
                         if (param->_dst != NULL) *(bool*)param->_dst = true;
                     } else {
                         if (a + 1 >= argc) {
+                            unargs__printErrorPrefix();
                             UNARGS_PRINT_ERR_STR("@TODO");
                             UNARGS_PRINT_ERR_LN();
                             return -1;
@@ -498,6 +511,7 @@ int unargs__parseArgs(
             }
 
             if (param == NULL) {
+                unargs__printErrorPrefix();
                 UNARGS_PRINT_ERR_STR("@TODO");
                 UNARGS_PRINT_ERR_LN();
                 return -1;
@@ -506,6 +520,7 @@ int unargs__parseArgs(
             a += unargs__argCnt(param);
         } else {
             if (nextPos >= len) {
+                unargs__printErrorPrefix();
                 UNARGS_PRINT_ERR_STR("@TODO");
                 UNARGS_PRINT_ERR_LN();
                 return -1;
@@ -527,6 +542,7 @@ int unargs__parseArgs(
 
     for (int p = 0; p < len; ++p) {
         if (params[p]._req && !params[p]._found) {
+            unargs__printErrorPrefix();
             UNARGS_PRINT_ERR_STR("@TODO");
             UNARGS_PRINT_ERR_LN();
             return -1;
