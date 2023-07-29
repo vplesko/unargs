@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
+typedef int (*TestFunc)(void);
+
 #define PRINT_TEST_FAIL() \
     fprintf(stderr, "Test failed: %s:%d %s\n", __FILE__, __LINE__, __func__)
 
@@ -24,7 +26,14 @@
         } \
     } while (0)
 
+#define PREV_TEST NULL
+TestFunc prevTest = NULL;
+
 int testBasic(void) {
+    prevTest = PREV_TEST;
+#undef PREV_TEST
+#define PREV_TEST testBasic
+
     char *argv[] = {
         "main",
         "-bt",
@@ -82,6 +91,10 @@ int testBasic(void) {
 }
 
 int testTypes(void) {
+    prevTest = PREV_TEST;
+#undef PREV_TEST
+#define PREV_TEST testTypes
+
     char *argv[] = {
         "main",
         "-b",
@@ -138,6 +151,10 @@ int testTypes(void) {
 }
 
 int testScrambled(void) {
+    prevTest = PREV_TEST;
+#undef PREV_TEST
+#define PREV_TEST testScrambled
+
     char *argv[] = {
         "main",
         "-dummy", "dummy",
@@ -178,6 +195,10 @@ int testScrambled(void) {
 }
 
 int testBadArgs(void) {
+    prevTest = PREV_TEST;
+#undef PREV_TEST
+#define PREV_TEST testBadArgs
+
     {
         char *argv[] = {
             "main",
@@ -368,11 +389,10 @@ int testBadArgs(void) {
 }
 
 int main(void) {
-    if (testBasic() != 0 ||
-        testScrambled() != 0 ||
-        testTypes() != 0 ||
-        testBadArgs() != 0) {
-        return -1;
+    TestFunc f = PREV_TEST;
+    while (f != NULL) {
+        if (f() != 0) return -1;
+        f = prevTest;
     }
 
     return 0;
