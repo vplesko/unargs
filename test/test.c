@@ -189,7 +189,9 @@ int testHelp(void) {
         unargs_doubleReq("d", NULL, NULL),
         unargs_double("ddef", NULL, 0.0, NULL),
         unargs_stringReq("str", NULL, NULL),
-        unargs_string("strdef", NULL, "1", NULL),
+        unargs_string("strdef0", NULL, "1", NULL),
+        unargs_string("strdef1", NULL, "", NULL),
+        unargs_string("strdef2", NULL, NULL, NULL),
 
         unargs_intReq(NULL, NULL, NULL),
         unargs_unsignedReq(NULL, NULL, NULL),
@@ -203,6 +205,8 @@ int testHelp(void) {
         unargs_float(NULL, NULL, 0.0f, NULL),
         unargs_double(NULL, "desc", 0.0, NULL),
         unargs_string(NULL, NULL, "1", NULL),
+        unargs_string(NULL, NULL, "", NULL),
+        unargs_string(NULL, NULL, NULL, NULL),
     };
 
     unargs_help("test", sizeof(params) / sizeof(*params), params);

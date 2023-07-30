@@ -2,15 +2,17 @@
 #include "unargs.h"
 
 int main(int argc, char *argv[]) {
-    const char *path;
+    const char *pathIn;
+    const char *pathOut;
     int n, w, h;
     bool flip, rot;
 
     unargs_Param params[] = {
-        unargs_stringReq(NULL, "Input image path.", &path),
+        unargs_stringReq(NULL, "Input image path.", &pathIn),
         unargs_intReq("n", "N parameter.", &n),
         unargs_intReq("w", "Output width.", &w),
         unargs_intReq("h", "Output height.", &h),
+        unargs_string("o", "Output image path.", NULL, &pathOut),
         unargs_bool("flip", NULL, &flip),
         unargs_bool("rot", NULL, &rot),
     };
