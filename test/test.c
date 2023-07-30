@@ -105,7 +105,6 @@ int testBasic(void) {
     return 0;
 }
 
-// When adding new types, update code wherever this comment appears.
 int testTypes(void) {
     prevTest = PREV_TEST;
 #undef PREV_TEST
@@ -115,6 +114,7 @@ int testTypes(void) {
         "main",
         "-b",
         "-i", "1",
+        "-u", "2",
         "-l", "9223372036854775807",
         "-f", "1.0",
         "-d", "2.0",
@@ -123,6 +123,7 @@ int testTypes(void) {
 
     bool b, bdef;
     int i, idef;
+    unsigned u, udef;
     long l, ldef;
     float f, fdef;
     double d, ddef;
@@ -133,6 +134,8 @@ int testTypes(void) {
         unargs_bool("bdef", NULL, &bdef),
         unargs_intReq("i", NULL, &i),
         unargs_int("idef", NULL, -1, &idef),
+        unargs_unsignedReq("u", NULL, &u),
+        unargs_unsigned("udef", NULL, (unsigned)-2, &udef),
         unargs_longReq("l", NULL, &l),
         unargs_long("ldef", NULL, -9223372036854775807, &ldef),
         unargs_floatReq("f", NULL, &f),
@@ -154,6 +157,8 @@ int testTypes(void) {
     EXPECT_EQ(bdef, false);
     EXPECT_EQ(i, 1);
     EXPECT_EQ(idef, -1);
+    EXPECT_EQ(u, 2);
+    EXPECT_EQ(udef, (unsigned)-2);
     EXPECT_EQ(l, 9223372036854775807);
     EXPECT_EQ(ldef, -9223372036854775807);
     EXPECT_EQ(f, 1.0f);
@@ -166,7 +171,6 @@ int testTypes(void) {
     return 0;
 }
 
-// When adding new types, update code wherever this comment appears.
 int testHelp(void) {
     prevTest = PREV_TEST;
 #undef PREV_TEST
@@ -176,6 +180,8 @@ int testHelp(void) {
         unargs_bool("b", NULL, NULL),
         unargs_intReq("i", "desc", NULL),
         unargs_int("idef", NULL, 1, NULL),
+        unargs_unsignedReq("u", "desc", NULL),
+        unargs_unsigned("udef", NULL, 1, NULL),
         unargs_longReq("l", NULL, NULL),
         unargs_long("ldef", "desc", 1, NULL),
         unargs_floatReq("f", NULL, NULL),
@@ -186,11 +192,13 @@ int testHelp(void) {
         unargs_string("strdef", NULL, "1", NULL),
 
         unargs_intReq(NULL, NULL, NULL),
+        unargs_unsignedReq(NULL, NULL, NULL),
         unargs_longReq(NULL, NULL, NULL),
         unargs_floatReq(NULL, "desc", NULL),
         unargs_doubleReq(NULL, NULL, NULL),
         unargs_stringReq(NULL, NULL, NULL),
         unargs_int(NULL, NULL, 1, NULL),
+        unargs_unsigned(NULL, NULL, 1, NULL),
         unargs_long(NULL, NULL, 1, NULL),
         unargs_float(NULL, NULL, 0.0f, NULL),
         unargs_double(NULL, "desc", 0.0, NULL),
