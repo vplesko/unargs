@@ -42,40 +42,49 @@ unargs_parse.
 It should look like this:
 
     unargs_Param params[] = {
-        // required option '-name1'
-        unargs_intReq("name1", "Description.", &i1),
+        // required option '-i1'
+        unargs_intReq("i1", "Description.", &i1),
 
-        // non-required option '-name2', default value is 100
-        unargs_int("name2", "Description.", 100, &i2),
+        // non-required option '-i2', default value is 100
+        unargs_int("i2", "Description.", 100, &i2),
 
         // required positional
         unargs_intReq(NULL, "Description.", &i3),
 
         // non-required positional, default value is 200
         unargs_int(NULL, "Description.", 200, &i4),
+
+        // bools are specific:
+        // they are always non-required,
+        // they cannot be positionals,
+        // and their default value is always false
+        unargs_bool("b", "Description.", &b),
     };
     unargs_parse(argc, argv, sizeof(params) / sizeof(*params), params);
 
 Valid ways to call the program would then be:
 
-    # pass in all values
-    main -name1 1111 -name2 2222 3333 4444
+    # pass in all values, set b to true
+    main -i1 1111 -i2 2222 3333 4444 -b
+
+    # pass in all values, leave b as false
+    main -i1 1111 -i2 2222 3333 4444
 
     # pass in only required values
-    main -name1 1111 3333
+    main -i1 1111 3333
 
     # pass in both options and only the required positional
-    main -name1 1111 -name2 2222 3333
+    main -i1 1111 -i2 2222 3333
 
     # pass in both positionals and only the required option
-    main -name1 1111 3333 4444
+    main -i1 1111 3333 4444
 
     # ordering of positionals matters
     # and options must be passed in as '-name val',
     # otherwise any order is fine
-    main -name2 2222 -name1 1111 3333 4444
-    main 3333 4444 -name1 1111 -name2 2222
-    main 3333 -name2 2222 -name1 1111 4444
+    main -i2 2222 -i1 1111 3333 4444 -b
+    main 3333 -b 4444 -i1 1111 -i2 2222
+    main -b 3333 -i2 2222 -i1 1111 4444
 
 unargs_parse returns 0 on success, non-zero on failure.
 
@@ -89,6 +98,11 @@ Positionals have no names and are passed in with just the value.
 Parameters can be required or non-required. unargs_parse checks that all
 required arguments have been passed in. Non-required parameters will be given a
 default value if not passed in.
+
+Bools are an exception:
+    1) they cannot be positionals;
+    2) they are always non-required with the default of false;
+    3) they are set to true by passing in '-name' (no value after).
 
 unargs_help prints usage instructions on the standard output:
 
@@ -114,6 +128,7 @@ You can also define UNARGS_ASSERT(x) if you don't want unargs to use C's assert.
 #include <stdbool.h>
 
 // @TODO doc comments
+// @TODO strings with assert conditions
 
 typedef struct unargs_Param unargs_Param;
 
