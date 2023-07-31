@@ -128,7 +128,6 @@ You can also define UNARGS_ASSERT(x) if you don't want unargs to use C's assert.
 #include <stdbool.h>
 
 // @TODO doc comments
-// @TODO strings with assert conditions
 
 typedef struct unargs_Param unargs_Param;
 
@@ -512,9 +511,12 @@ void unargs__verifyParams(int len, const unargs_Param *params) {
     bool posNonReqFound = false;
     for (int i = 0; i < len; ++i) {
         if (unargs__paramIsPos(&params[i])) {
-            // Required positionals must preceed non-required ones.
-            if (params[i]._req) UNARGS_ASSERT(!posNonReqFound);
-            else posNonReqFound = true;
+            if (params[i]._req) {
+                UNARGS_ASSERT(!posNonReqFound &&
+                    "Required positionals must preceed non-required ones.");
+            } else {
+                posNonReqFound = true;
+            }
         }
     }
 
@@ -524,16 +526,16 @@ void unargs__verifyParams(int len, const unargs_Param *params) {
         for (int j = i + 1; j < len; ++j) {
             if (!unargs__paramIsOpt(&params[j])) continue;
 
-            // Names of optionals must be unique.
-            UNARGS_ASSERT(strcmp(params[i]._name, params[j]._name) != 0);
+            UNARGS_ASSERT(strcmp(params[i]._name, params[j]._name) != 0 &&
+                "Names of options must be unique.");
         }
     }
 
     for (int i = 0; i < len; ++i) {
         for (int j = i + 1; j < len; ++j) {
             if (params[i]._dst != NULL && params[j]._dst != NULL) {
-                // Value destinations must be unique, unless null.
-                UNARGS_ASSERT(params[i]._dst != params[j]._dst);
+                UNARGS_ASSERT(params[i]._dst != params[j]._dst &&
+                    "Value destinations must be unique (unless null).");
             }
         }
     }
