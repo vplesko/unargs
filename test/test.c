@@ -470,11 +470,13 @@ int testBadArgs(void) {
 }
 
 int main(void) {
+    int ret = 0;
+
     TestFunc f = PREV_TEST;
     while (f != NULL) {
-        if (f() != 0) return -1;
+        if (f() != 0) ret = 1;
         f = prevTest;
     }
 
-    return 0;
+    return ret;
 }
