@@ -22,12 +22,98 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// @TODO doc comments
+/*
+This is a single-header-file library for parsing main arguments (argc and argv).
+It does NOT follow Unix conventions! If that is what you want, this is not the
+library to use.
+
+Include this file like this:
+
+    #define UNARGS_IMPLEMENTATION
+    #include "unargs.h"
+
+in ONE of your source files to include the implementation. You can then include
+it without the define in other files and not get linker errors.
+
+To parse argc and argv, first create an array of unargs_Param objects using
+unargs_<type> and unargs_<type>Req functions, then pass this array to
+unargs_parse.
+
+It should look like this:
+
+    unargs_Param params[] = {
+        // required option '-name1'
+        unargs_intReq("name1", "Description.", &i1),
+
+        // non-required option '-name2', default value is 100
+        unargs_int("name2", "Description.", 100, &i2),
+
+        // required positional
+        unargs_intReq(NULL, "Description.", &i3),
+
+        // non-required positional, default value is 200
+        unargs_int(NULL, "Description.", 200, &i4),
+    };
+    unargs_parse(argc, argv, sizeof(params) / sizeof(*params), params);
+
+Valid ways to call the program would then be:
+
+    # pass in all values
+    main -name1 1111 -name2 2222 3333 4444
+
+    # pass in only required values
+    main -name1 1111 3333
+
+    # pass in both options and only the required positional
+    main -name1 1111 -name2 2222 3333
+
+    # pass in both positionals and only the required option
+    main -name1 1111 3333 4444
+
+    # ordering of positionals matters
+    # and options must be passed in as '-name val',
+    # otherwise any order is fine
+    main -name2 2222 -name1 1111 3333 4444
+    main 3333 4444 -name1 1111 -name2 2222
+    main 3333 -name2 2222 -name1 1111 4444
+
+unargs_parse returns 0 on success, non-zero on failure.
+
+Some terminology:
+    parameter - part of your interface;
+    argument - value being passed through argv.
+
+Parameters can be options or positionals. Options are passed in as '-name val'.
+Positionals have no names and are passed in with just the value.
+
+Parameters can be required or non-required. unargs_parse checks that all
+required arguments have been passed in. Non-required parameters will be given a
+default value if not passed in.
+
+unargs_help prints usage instructions on the standard output:
+
+    unargs_help("main", sizeof(params) / sizeof(*params), params);
+
+Both functions use fprintf to print to stdout and stderr. You can override this
+by defining print macros (before including this header):
+
+    #define UNARGS_PRINT_OUT_<type>(x) ...
+    #define UNARGS_PRINT_OUT_TAB(x) ... # tab character
+    #define UNARGS_PRINT_OUT_LN(x) ... # new line
+
+    #define UNARGS_PRINT_ERR_<type>(x) ...
+    #define UNARGS_PRINT_ERR_TAB(x) ... # tab character
+    #define UNARGS_PRINT_ERR_LN(x) ... # new line
+
+You can also define UNARGS_ASSERT(x) if you don't want unargs to use C's assert.
+*/
 
 #ifndef INCLUDE_UNARGS_H
 #define INCLUDE_UNARGS_H
 
 #include <stdbool.h>
+
+// @TODO doc comments
 
 typedef struct unargs_Param unargs_Param;
 
