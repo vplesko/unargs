@@ -115,7 +115,7 @@ int testTypes(void) {
         "-b",
         "-i", "1",
         "-u", "2",
-        "-l", "9223372036854775807",
+        "-l", "3",
         "-f", "1.0",
         "-d", "2.0",
         "-str", "foo",
@@ -137,7 +137,7 @@ int testTypes(void) {
         unargs_unsignedReq("u", NULL, &u),
         unargs_unsigned("udef", NULL, (unsigned)-2, &udef),
         unargs_longReq("l", NULL, &l),
-        unargs_long("ldef", NULL, -9223372036854775807, &ldef),
+        unargs_long("ldef", NULL, -3, &ldef),
         unargs_floatReq("f", NULL, &f),
         unargs_float("fdef", NULL, -1.0f, &fdef),
         unargs_doubleReq("d", NULL, &d),
@@ -159,8 +159,8 @@ int testTypes(void) {
     EXPECT_EQ(idef, -1);
     EXPECT_EQ(u, 2);
     EXPECT_EQ(udef, (unsigned)-2);
-    EXPECT_EQ(l, 9223372036854775807);
-    EXPECT_EQ(ldef, -9223372036854775807);
+    EXPECT_EQ(l, 3);
+    EXPECT_EQ(ldef, -3);
     EXPECT_EQ(f, 1.0f);
     EXPECT_EQ(fdef, -1.0f);
     EXPECT_EQ(d, 2.0);
@@ -288,6 +288,23 @@ int testBadArgs(void) {
 
         unargs_Param params[] = {
             unargs_intReq("i", NULL, NULL),
+        };
+
+        if (unargs_parse(
+                sizeof(argv) / sizeof(*argv), argv,
+                sizeof(params) / sizeof(*params), params) >= 0) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        char *argv[] = {
+            "main",
+            "-u", "9223372036854775807",
+        };
+
+        unargs_Param params[] = {
+            unargs_unsignedReq("u", NULL, NULL),
         };
 
         if (unargs_parse(

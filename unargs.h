@@ -532,8 +532,9 @@ void unargs__printTypeErr(enum unargs__Type type) {
 
 int unargs__parseLong(const char *str, long *l) {
     char *end;
+    errno = 0;
     *l = strtol(str, &end, 0);
-    if (*end != '\0') {
+    if (errno != 0 || *end != '\0') {
         unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR("Could not parse integer value from '");
         UNARGS_PRINT_ERR_STR(str);
@@ -547,8 +548,9 @@ int unargs__parseLong(const char *str, long *l) {
 
 int unargs__parseUnsignedLong(const char *str, unsigned long *ul) {
     char *end;
+    errno = 0;
     *ul = strtoul(str, &end, 0);
-    if (*end != '\0') {
+    if (errno != 0 || *end != '\0') {
         unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR(
             "Could not parse non-negative integer value from '");
@@ -563,8 +565,9 @@ int unargs__parseUnsignedLong(const char *str, unsigned long *ul) {
 
 int unargs__parseFloat(const char *str, float *f) {
     char *end;
+    errno = 0;
     *f = strtof(str, &end);
-    if (*end != '\0') {
+    if (errno != 0 || *end != '\0') {
         unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR("Could not parse float value from '");
         UNARGS_PRINT_ERR_STR(str);
@@ -578,8 +581,9 @@ int unargs__parseFloat(const char *str, float *f) {
 
 int unargs__parseDouble(const char *str, double *d) {
     char *end;
+    errno = 0;
     *d = strtod(str, &end);
-    if (*end != '\0') {
+    if (errno != 0 || *end != '\0') {
         unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR("Could not parse double value from '");
         UNARGS_PRINT_ERR_STR(str);
