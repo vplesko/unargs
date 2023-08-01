@@ -160,9 +160,39 @@ typedef struct unargs_Param unargs_Param;
 unargs_Param unargs_bool(
     const char *name, const char *desc, bool *dst);
 
+/**
+ * Specify a non-required int parameter with a default value. The parameter will
+ * be an option if \c name is not null, or positional otherwise.
+ *
+ * \param name Name of the parameter. Defines how it will be passed in. If
+ * \c name is not null, this parameter will be an option. Otherwise, it will be
+ * positional.
+ *
+ * \param desc Description for the parameter to be displayed by \c unargs_help.
+ *
+ * \param dst Location where the parsed or default value will be written to.
+ *
+ * \return The created parameter. You can pass an array of these to
+ * \c unargs_parse or \c unargs_help.
+ */
 unargs_Param unargs_int(
     const char *name, const char *desc, int def, int *dst);
 
+/**
+ * Specify a required int parameter. The parameter will be an option if \c name
+ * is not null, or positional otherwise.
+ *
+ * \param name Name of the parameter. Defines how it will be passed in. If
+ * \c name is not null, this parameter will be an option. Otherwise, it will be
+ * positional.
+ *
+ * \param desc Description for the parameter to be displayed by \c unargs_help.
+ *
+ * \param dst Location where the parsed or default value will be written to.
+ *
+ * \return The created parameter. You can pass an array of these to
+ * \c unargs_parse or \c unargs_help.
+ */
 unargs_Param unargs_intReq(
     const char *name, const char *desc, int *dst);
 
