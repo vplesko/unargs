@@ -132,9 +132,8 @@ You can also define UNARGS_ASSERT(x) if you don't want unargs to use C's assert.
 
 typedef enum unargs_Status {
     UNARGS_OK = 0,
-    UNARGS_ERR = -1,
-    UNARGS_ERR_ARGS = -2,
-    UNARGS_ERR_PARAMS = -3
+    UNARGS_ERR_ARGS = -1,
+    UNARGS_ERR_PARAMS = -2
 } unargs_Status;
 
 typedef struct unargs_Param unargs_Param;
@@ -546,53 +545,53 @@ void unargs__printTypeErr(enum unargs__Type type) {
     else UNARGS_ASSERT(false);
 }
 
-unargs_Status unargs__parseLong(const char *str, long *l) {
+unargs_Status unargs__parseLong(const char *arg, long *l) {
     char *end;
     errno = 0;
-    *l = strtol(str, &end, 0);
+    *l = strtol(arg, &end, 0);
     if (errno != 0 || *end != '\0') {
         unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR("Could not parse integer value from '");
-        UNARGS_PRINT_ERR_STR(str);
+        UNARGS_PRINT_ERR_STR(arg);
         UNARGS_PRINT_ERR_STR("'.");
         UNARGS_PRINT_ERR_LN();
 
-        return UNARGS_ERR;
+        return UNARGS_ERR_ARGS;
     }
 
     return UNARGS_OK;
 }
 
-unargs_Status unargs__parseUnsignedLong(const char *str, unsigned long *ul) {
+unargs_Status unargs__parseUnsignedLong(const char *arg, unsigned long *ul) {
     char *end;
     errno = 0;
-    *ul = strtoul(str, &end, 0);
+    *ul = strtoul(arg, &end, 0);
     if (errno != 0 || *end != '\0') {
         unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR(
             "Could not parse non-negative integer value from '");
-        UNARGS_PRINT_ERR_STR(str);
+        UNARGS_PRINT_ERR_STR(arg);
         UNARGS_PRINT_ERR_STR("'.");
         UNARGS_PRINT_ERR_LN();
 
-        return UNARGS_ERR;
+        return UNARGS_ERR_ARGS;
     }
 
     return UNARGS_OK;
 }
 
-unargs_Status unargs__parseFloat(const char *str, float *f) {
+unargs_Status unargs__parseFloat(const char *arg, float *f) {
     char *end;
     errno = 0;
-    *f = strtof(str, &end);
+    *f = strtof(arg, &end);
     if (errno != 0 || *end != '\0') {
         unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR("Could not parse float value from '");
-        UNARGS_PRINT_ERR_STR(str);
+        UNARGS_PRINT_ERR_STR(arg);
         UNARGS_PRINT_ERR_STR("'.");
         UNARGS_PRINT_ERR_LN();
 
-        return UNARGS_ERR;
+        return UNARGS_ERR_ARGS;
     }
 
     return UNARGS_OK;
