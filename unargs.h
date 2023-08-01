@@ -148,7 +148,7 @@ typedef struct unargs_Param unargs_Param;
  * values after.
  *
  * \param name Name of the option. Defines how it will be passed in. Must not be
- * null.
+ * null nor an empty string.
  *
  * \param desc Description for the parameter to be displayed by \c unargs_help.
  *
@@ -166,9 +166,11 @@ unargs_Param unargs_bool(
  *
  * \param name Name of the parameter. Defines how it will be passed in. If
  * \c name is not null, this parameter will be an option. Otherwise, it will be
- * positional.
+ * positional. Must not be an empty string.
  *
  * \param desc Description for the parameter to be displayed by \c unargs_help.
+ *
+ * \param def The default value to be assigned in case argument is not provided.
  *
  * \param dst Location where the parsed or default value will be written to.
  *
@@ -184,7 +186,7 @@ unargs_Param unargs_int(
  *
  * \param name Name of the parameter. Defines how it will be passed in. If
  * \c name is not null, this parameter will be an option. Otherwise, it will be
- * positional.
+ * positional. Must not be an empty string.
  *
  * \param desc Description for the parameter to be displayed by \c unargs_help.
  *
@@ -196,21 +198,119 @@ unargs_Param unargs_int(
 unargs_Param unargs_intReq(
     const char *name, const char *desc, int *dst);
 
+/**
+ * Specify a non-required unsigned parameter with a default value. The parameter
+ * will be an option if \c name is not null, or positional otherwise.
+ *
+ * \param name Name of the parameter. Defines how it will be passed in. If
+ * \c name is not null, this parameter will be an option. Otherwise, it will be
+ * positional. Must not be an empty string.
+ *
+ * \param desc Description for the parameter to be displayed by \c unargs_help.
+ *
+ * \param def The default value to be assigned in case argument is not provided.
+ *
+ * \param dst Location where the parsed or default value will be written to.
+ *
+ * \return The created parameter. You can pass an array of these to
+ * \c unargs_parse or \c unargs_help.
+ */
 unargs_Param unargs_unsigned(
     const char *name, const char *desc, unsigned def, unsigned *dst);
 
+/**
+ * Specify a required unsigned parameter. The parameter will be an option if
+ * \c name is not null, or positional otherwise.
+ *
+ * \param name Name of the parameter. Defines how it will be passed in. If
+ * \c name is not null, this parameter will be an option. Otherwise, it will be
+ * positional. Must not be an empty string.
+ *
+ * \param desc Description for the parameter to be displayed by \c unargs_help.
+ *
+ * \param dst Location where the parsed or default value will be written to.
+ *
+ * \return The created parameter. You can pass an array of these to
+ * \c unargs_parse or \c unargs_help.
+ */
 unargs_Param unargs_unsignedReq(
     const char *name, const char *desc, unsigned *dst);
 
+/**
+ * Specify a non-required float parameter with a default value. The parameter
+ * will be an option if \c name is not null, or positional otherwise.
+ *
+ * \param name Name of the parameter. Defines how it will be passed in. If
+ * \c name is not null, this parameter will be an option. Otherwise, it will be
+ * positional. Must not be an empty string.
+ *
+ * \param desc Description for the parameter to be displayed by \c unargs_help.
+ *
+ * \param def The default value to be assigned in case argument is not provided.
+ *
+ * \param dst Location where the parsed or default value will be written to.
+ *
+ * \return The created parameter. You can pass an array of these to
+ * \c unargs_parse or \c unargs_help.
+ */
 unargs_Param unargs_float(
     const char *name, const char *desc, float def, float *dst);
 
+/**
+ * Specify a required float parameter. The parameter will be an option if
+ * \c name is not null, or positional otherwise.
+ *
+ * \param name Name of the parameter. Defines how it will be passed in. If
+ * \c name is not null, this parameter will be an option. Otherwise, it will be
+ * positional. Must not be an empty string.
+ *
+ * \param desc Description for the parameter to be displayed by \c unargs_help.
+ *
+ * \param dst Location where the parsed or default value will be written to.
+ *
+ * \return The created parameter. You can pass an array of these to
+ * \c unargs_parse or \c unargs_help.
+ */
 unargs_Param unargs_floatReq(
     const char *name, const char *desc, float *dst);
 
+/**
+ * Specify a non-required string parameter with a default value. The parameter
+ * will be an option if \c name is not null, or positional otherwise.
+ *
+ * \param name Name of the parameter. Defines how it will be passed in. If
+ * \c name is not null, this parameter will be an option. Otherwise, it will be
+ * positional. Must not be an empty string.
+ *
+ * \param desc Description for the parameter to be displayed by \c unargs_help.
+ *
+ * \param def The default value to be assigned in case argument is not provided.
+ * This string pointer will be assigned to the destination - be careful about
+ * lifetime implications of this.
+ *
+ * \param dst Location where the parsed or default value will be written to.
+ *
+ * \return The created parameter. You can pass an array of these to
+ * \c unargs_parse or \c unargs_help.
+ */
 unargs_Param unargs_string(
     const char *name, const char *desc, const char *def, const char **dst);
 
+/**
+ * Specify a required string parameter. The parameter will be an option if
+ * \c name is not null, or positional otherwise.
+ *
+ * \param name Name of the parameter. Defines how it will be passed in. If
+ * \c name is not null, this parameter will be an option. Otherwise, it will be
+ * positional. Must not be an empty string.
+ *
+ * \param desc Description for the parameter to be displayed by \c unargs_help.
+ *
+ * \param dst Location where the parsed or default value will be written to.
+ *
+ * \return The created parameter. You can pass an array of these to
+ * \c unargs_parse or \c unargs_help.
+ */
 unargs_Param unargs_stringReq(
     const char *name, const char *desc, const char **dst);
 
