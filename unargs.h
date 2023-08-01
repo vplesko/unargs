@@ -86,7 +86,7 @@ Valid ways to call the program would then be:
     main 3333 -b 4444 -i1 1111 -i2 2222
     main -b 3333 -i2 2222 -i1 1111 4444
 
-unargs_parse and unargs_help return UNARGS_OK (0) on success, non-zero values on
+unargs_parse and unargs_help return unargs_ok (0) on success, non-zero values on
 failure.
 
 Some terminology:
@@ -131,9 +131,9 @@ You can also define UNARGS_ASSERT(x) if you don't want unargs to use C's assert.
 // @TODO doc comments
 
 typedef enum unargs_Status {
-    UNARGS_OK = 0,
-    UNARGS_ERR_ARGS = -1,
-    UNARGS_ERR_PARAMS = -2
+    unargs_ok = 0,
+    unargs_err_args = -1,
+    unargs_err_params = -2
 } unargs_Status;
 
 typedef struct unargs_Param unargs_Param;
@@ -413,7 +413,7 @@ unargs_Status unargs__verifyParams(int len, const unargs_Param *params) {
         UNARGS_PRINT_ERR_STR(".");
         UNARGS_PRINT_ERR_LN();
 
-        return UNARGS_ERR_PARAMS;
+        return unargs_err_params;
     }
     if (len > 0 && params == NULL) {
         unargs__printErrorParamsPrefix();
@@ -421,7 +421,7 @@ unargs_Status unargs__verifyParams(int len, const unargs_Param *params) {
             "Parameter array must not be null when length is non-zero.");
         UNARGS_PRINT_ERR_LN();
 
-        return UNARGS_ERR_PARAMS;
+        return unargs_err_params;
     }
 
     for (int i = 0; i < len; ++i) {
@@ -434,7 +434,7 @@ unargs_Status unargs__verifyParams(int len, const unargs_Param *params) {
                     "Bool parameter names must not be null or empty.");
                 UNARGS_PRINT_ERR_LN();
 
-                return UNARGS_ERR_PARAMS;
+                return unargs_err_params;
             }
         } else {
             if (param->_name != NULL && strlen(param->_name) == 0) {
@@ -445,7 +445,7 @@ unargs_Status unargs__verifyParams(int len, const unargs_Param *params) {
                     " declare its name as null.");
                 UNARGS_PRINT_ERR_LN();
 
-                return UNARGS_ERR_PARAMS;
+                return unargs_err_params;
             }
         }
     }
@@ -460,7 +460,7 @@ unargs_Status unargs__verifyParams(int len, const unargs_Param *params) {
                         "Required positionals must preceed non-required ones.");
                     UNARGS_PRINT_ERR_LN();
 
-                    return UNARGS_ERR_PARAMS;
+                    return unargs_err_params;
                 }
             } else {
                 posNonReqFound = true;
@@ -482,7 +482,7 @@ unargs_Status unargs__verifyParams(int len, const unargs_Param *params) {
                 UNARGS_PRINT_ERR_STR(" appears multiple times.");
                 UNARGS_PRINT_ERR_LN();
 
-                return UNARGS_ERR_PARAMS;
+                return unargs_err_params;
             }
         }
     }
@@ -495,12 +495,12 @@ unargs_Status unargs__verifyParams(int len, const unargs_Param *params) {
                     "Value destinations must be unique (unless null).");
                 UNARGS_PRINT_ERR_LN();
 
-                return UNARGS_ERR_PARAMS;
+                return unargs_err_params;
             }
         }
     }
 
-    return UNARGS_OK;
+    return unargs_ok;
 }
 
 bool unargs__isOpt(const char *arg) {
@@ -517,14 +517,14 @@ unargs_Status unargs__verifyArgs(int argc, char * const *argv) {
         UNARGS_PRINT_ERR_STR("At least one argument expected (program name).");
         UNARGS_PRINT_ERR_LN();
 
-        return UNARGS_ERR_ARGS;
+        return unargs_err_args;
     }
     if (argv == NULL) {
         unargs__printErrorArgsPrefix();
         UNARGS_PRINT_ERR_STR("argv must not be null.");
         UNARGS_PRINT_ERR_LN();
 
-        return UNARGS_ERR_ARGS;
+        return unargs_err_args;
     }
     for (int i = 0; i < argc; ++i) {
         if (argv[i] == NULL) {
@@ -534,7 +534,7 @@ unargs_Status unargs__verifyArgs(int argc, char * const *argv) {
             UNARGS_PRINT_ERR_STR("] is null.");
             UNARGS_PRINT_ERR_LN();
 
-            return UNARGS_ERR_ARGS;
+            return unargs_err_args;
         }
         if (strlen(argv[i]) == 0) {
             unargs__printErrorArgsPrefix();
@@ -543,11 +543,11 @@ unargs_Status unargs__verifyArgs(int argc, char * const *argv) {
             UNARGS_PRINT_ERR_STR("] is empty.");
             UNARGS_PRINT_ERR_LN();
 
-            return UNARGS_ERR_ARGS;
+            return unargs_err_args;
         }
     }
 
-    return UNARGS_OK;
+    return unargs_ok;
 }
 
 bool unargs__optNameMatches(const char *arg, const unargs_Param *param) {
@@ -602,10 +602,10 @@ unargs_Status unargs__parseLong(const char *arg, long *l) {
         UNARGS_PRINT_ERR_STR("'.");
         UNARGS_PRINT_ERR_LN();
 
-        return UNARGS_ERR_ARGS;
+        return unargs_err_args;
     }
 
-    return UNARGS_OK;
+    return unargs_ok;
 }
 
 unargs_Status unargs__parseUnsignedLong(const char *arg, unsigned long *ul) {
@@ -620,10 +620,10 @@ unargs_Status unargs__parseUnsignedLong(const char *arg, unsigned long *ul) {
         UNARGS_PRINT_ERR_STR("'.");
         UNARGS_PRINT_ERR_LN();
 
-        return UNARGS_ERR_ARGS;
+        return unargs_err_args;
     }
 
-    return UNARGS_OK;
+    return unargs_ok;
 }
 
 unargs_Status unargs__parseFloat(const char *arg, float *f) {
@@ -637,17 +637,17 @@ unargs_Status unargs__parseFloat(const char *arg, float *f) {
         UNARGS_PRINT_ERR_STR("'.");
         UNARGS_PRINT_ERR_LN();
 
-        return UNARGS_ERR_ARGS;
+        return unargs_err_args;
     }
 
-    return UNARGS_OK;
+    return unargs_ok;
 }
 
 unargs_Status unargs__parseVal(const char *str, const unargs_Param *param) {
     if (param->_type == unargs__typeInt) {
         long l;
-        if (unargs__parseLong(str, &l) != UNARGS_OK) {
-            return UNARGS_ERR_ARGS;
+        if (unargs__parseLong(str, &l) != unargs_ok) {
+            return unargs_err_args;
         }
 
         int i = (int)l;
@@ -658,14 +658,14 @@ unargs_Status unargs__parseVal(const char *str, const unargs_Param *param) {
             UNARGS_PRINT_ERR_STR(" inside an int.");
             UNARGS_PRINT_ERR_LN();
 
-            return UNARGS_ERR_ARGS;
+            return unargs_err_args;
         }
 
         if (param->_dst != NULL) *(int*)param->_dst = i;
     } else if (param->_type == unargs__typeUnsigned) {
         unsigned long ul;
-        if (unargs__parseUnsignedLong(str, &ul) != UNARGS_OK) {
-            return UNARGS_ERR_ARGS;
+        if (unargs__parseUnsignedLong(str, &ul) != unargs_ok) {
+            return unargs_err_args;
         }
 
         unsigned u = (unsigned)ul;
@@ -676,14 +676,14 @@ unargs_Status unargs__parseVal(const char *str, const unargs_Param *param) {
             UNARGS_PRINT_ERR_STR(" inside an unsigned.");
             UNARGS_PRINT_ERR_LN();
 
-            return UNARGS_ERR_ARGS;
+            return unargs_err_args;
         }
 
         if (param->_dst != NULL) *(unsigned*)param->_dst = u;
     } else if (param->_type == unargs__typeFloat) {
         float f;
-        if (unargs__parseFloat(str, &f) != UNARGS_OK) {
-            return UNARGS_ERR_ARGS;
+        if (unargs__parseFloat(str, &f) != unargs_ok) {
+            return unargs_err_args;
         }
 
         if (param->_dst != NULL) *(float*)param->_dst = f;
@@ -693,7 +693,7 @@ unargs_Status unargs__parseVal(const char *str, const unargs_Param *param) {
         UNARGS_ASSERT(false);
     }
 
-    return UNARGS_OK;
+    return unargs_ok;
 }
 
 unargs_Status unargs__parseArgs(
@@ -723,7 +723,7 @@ unargs_Status unargs__parseArgs(
                         UNARGS_PRINT_ERR_STR("' provided more than once.");
                         UNARGS_PRINT_ERR_LN();
 
-                        return UNARGS_ERR_ARGS;
+                        return unargs_err_args;
                     }
 
                     if (param->_type == unargs__typeBool) {
@@ -736,11 +736,11 @@ unargs_Status unargs__parseArgs(
                             UNARGS_PRINT_ERR_STR("'.");
                             UNARGS_PRINT_ERR_LN();
 
-                            return UNARGS_ERR_ARGS;
+                            return unargs_err_args;
                         }
 
-                        if (unargs__parseVal(argv[a + 1], param) != UNARGS_OK) {
-                            return UNARGS_ERR_ARGS;
+                        if (unargs__parseVal(argv[a + 1], param) != unargs_ok) {
+                            return unargs_err_args;
                         }
                     }
 
@@ -755,7 +755,7 @@ unargs_Status unargs__parseArgs(
                 UNARGS_PRINT_ERR_STR("'.");
                 UNARGS_PRINT_ERR_LN();
 
-                return UNARGS_ERR_ARGS;
+                return unargs_err_args;
             }
 
             a += unargs__argCnt(param);
@@ -768,11 +768,11 @@ unargs_Status unargs__parseArgs(
                 UNARGS_PRINT_ERR_STR("'.");
                 UNARGS_PRINT_ERR_LN();
 
-                return UNARGS_ERR_ARGS;
+                return unargs_err_args;
             }
 
-            if (unargs__parseVal(argv[a], &params[nextPos]) != UNARGS_OK) {
-                return UNARGS_ERR_ARGS;
+            if (unargs__parseVal(argv[a], &params[nextPos]) != unargs_ok) {
+                return unargs_err_args;
             }
             params[nextPos]._found = true;
 
@@ -802,28 +802,28 @@ unargs_Status unargs__parseArgs(
             }
             UNARGS_PRINT_ERR_LN();
 
-            return UNARGS_ERR_ARGS;
+            return unargs_err_args;
         }
     }
 
-    return UNARGS_OK;
+    return unargs_ok;
 }
 
 unargs_Status unargs_parse(
     int argc, char * const *argv,
     int len, unargs_Param *params) {
-    if (unargs__verifyParams(len, params) != UNARGS_OK) {
-        return UNARGS_ERR_PARAMS;
+    if (unargs__verifyParams(len, params) != unargs_ok) {
+        return unargs_err_params;
     }
-    if (unargs__verifyArgs(argc, argv) != UNARGS_OK) {
-        return UNARGS_ERR_ARGS;
-    }
-
-    if (unargs__parseArgs(argc, argv, len, params) != UNARGS_OK) {
-        return UNARGS_ERR_ARGS;
+    if (unargs__verifyArgs(argc, argv) != unargs_ok) {
+        return unargs_err_args;
     }
 
-    return UNARGS_OK;
+    if (unargs__parseArgs(argc, argv, len, params) != unargs_ok) {
+        return unargs_err_args;
+    }
+
+    return unargs_ok;
 }
 
 void unargs__printDef(const unargs_Param *param) {
@@ -988,15 +988,15 @@ void unargs__printOptions(int len, const unargs_Param *params) {
 unargs_Status unargs_help(
     const char *program,
     int len, const unargs_Param *params) {
-    if (unargs__verifyParams(len, params) != UNARGS_OK) {
-        return UNARGS_ERR_PARAMS;
+    if (unargs__verifyParams(len, params) != unargs_ok) {
+        return unargs_err_params;
     }
 
     unargs__printUsage(program, len, params);
     unargs__printPositionals(len, params);
     unargs__printOptions(len, params);
 
-    return UNARGS_OK;
+    return unargs_ok;
 }
 
 #endif // UNARGS_IMPLEMENTATION
