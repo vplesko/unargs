@@ -112,11 +112,11 @@ unargs_help prints usage instructions on the standard output:
 Both functions use fprintf to print to stdout and stderr. You can override this
 by defining print macros (before including this header):
 
-    #define UNARGS_PRINT_OUT_<type>(x) ...
+    #define UNARGS_PRINT_OUT_<TYPE>(x) ...
     #define UNARGS_PRINT_OUT_TAB(x) ... # tab character
     #define UNARGS_PRINT_OUT_LN(x) ... # new line
 
-    #define UNARGS_PRINT_ERR_<type>(x) ...
+    #define UNARGS_PRINT_ERR_<TYPE>(x) ...
     #define UNARGS_PRINT_ERR_TAB(x) ... # tab character
     #define UNARGS_PRINT_ERR_LN(x) ... # new line
 
@@ -131,13 +131,32 @@ You can also define UNARGS_ASSERT(x) if you don't want unargs to use C's assert.
 // @TODO doc comments
 
 enum {
+    // Call was successful.
     unargs_ok = 0,
+    // There was an error due to user arguments.
     unargs_err_args = -1,
+    // There was an error in parameters.
     unargs_err_params = -2
 };
 
+// Type that holds parameter properties.
 typedef struct unargs_Param unargs_Param;
 
+/**
+ * Specify a bool parameter. Bool parameters are always non-required options
+ * with the default value of false. They are passed in as \c -name without any
+ * values after.
+ *
+ * \param name Name of the option. Defines how it will be passed in. Must not be
+ * null.
+ *
+ * \param desc Description for the parameter to be displayed by \c unargs_help.
+ *
+ * \param dst Location where the parsed or default value will be written to.
+ *
+ * \return The created parameter. You can pass an array of these to
+ * \c unargs_parse or \c unargs_help.
+ */
 unargs_Param unargs_bool(
     const char *name, const char *desc, bool *dst);
 
