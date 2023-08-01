@@ -103,6 +103,25 @@ int testBasic(void) {
     return 0;
 }
 
+int testNoParams(void) {
+    prevTest = PREV_TEST;
+#undef PREV_TEST
+#define PREV_TEST testNoParams
+
+    char *argv[] = {
+        "main",
+    };
+
+    if (unargs_parse(
+            sizeof(argv) / sizeof(*argv), argv,
+            0, NULL) != UNARGS_OK) {
+        PRINT_TEST_FAIL();
+        return -1;
+    }
+
+    return 0;
+}
+
 int testTypes(void) {
     prevTest = PREV_TEST;
 #undef PREV_TEST
@@ -232,6 +251,132 @@ int testScrambled(void) {
     EXPECT_EQ(i, 123);
     EXPECT_STR_EQ(str, "abc");
     EXPECT_STR_EQ(pos0, "foo");
+
+    return 0;
+}
+
+int testBadParams(void) {
+    prevTest = PREV_TEST;
+#undef PREV_TEST
+#define PREV_TEST testBadParams
+
+    {
+        char *argv[] = {
+            "main",
+            "-i", "1",
+        };
+
+        unargs_Param params[] = {
+            unargs_intReq("i", NULL, NULL),
+        };
+
+        if (unargs_parse(
+                sizeof(argv) / sizeof(*argv), argv,
+                -1, params) != UNARGS_ERR_PARAMS) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        char *argv[] = {
+            "main",
+            "-i", "1",
+        };
+
+        unargs_Param params[] = {
+            unargs_intReq("i", NULL, NULL),
+        };
+
+        if (unargs_parse(
+                sizeof(argv) / sizeof(*argv), argv,
+                sizeof(params) / sizeof(*params), NULL) != UNARGS_ERR_PARAMS) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        unargs_Param params[] = {
+            unargs_bool(NULL, NULL, NULL),
+        };
+
+        if (unargs_help(
+                NULL,
+                sizeof(params) / sizeof(*params),
+                params) != UNARGS_ERR_PARAMS) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        unargs_Param params[] = {
+            unargs_bool("", NULL, NULL),
+        };
+
+        if (unargs_help(
+                NULL,
+                sizeof(params) / sizeof(*params),
+                params) != UNARGS_ERR_PARAMS) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        unargs_Param params[] = {
+            unargs_intReq("", NULL, NULL),
+        };
+
+        if (unargs_help(
+                NULL,
+                sizeof(params) / sizeof(*params),
+                params) != UNARGS_ERR_PARAMS) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        unargs_Param params[] = {
+            unargs_int(NULL, NULL, 0, NULL),
+            unargs_intReq(NULL, NULL, NULL),
+        };
+
+        if (unargs_help(
+                NULL,
+                sizeof(params) / sizeof(*params),
+                params) != UNARGS_ERR_PARAMS) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        unargs_Param params[] = {
+            unargs_intReq("i", NULL, NULL),
+            unargs_int("i", NULL, 0, NULL),
+        };
+
+        if (unargs_help(
+                NULL,
+                sizeof(params) / sizeof(*params),
+                params) != UNARGS_ERR_PARAMS) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
+    {
+        int i;
+
+        unargs_Param params[] = {
+            unargs_intReq("i1", NULL, &i),
+            unargs_int("i2", NULL, 0, &i),
+        };
+
+        if (unargs_help(
+                NULL,
+                sizeof(params) / sizeof(*params),
+                params) != UNARGS_ERR_PARAMS) {
+            PRINT_TEST_FAIL();
+            return -1;
+        }
+    }
 
     return 0;
 }

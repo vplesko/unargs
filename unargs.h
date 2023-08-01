@@ -278,9 +278,6 @@ struct unargs_Param {
 
 unargs_Param unargs_bool(
     const char *name, const char *desc, bool *dst) {
-    UNARGS_ASSERT(name != NULL);
-    UNARGS_ASSERT(strlen(name) > 0);
-
     unargs_Param param;
     param._name = name;
     param._type = unargs__typeBool;
@@ -294,8 +291,6 @@ unargs_Param unargs_bool(
 
 unargs_Param unargs_int(
     const char *name, const char *desc, int def, int *dst) {
-    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
-
     unargs_Param param;
     param._name = name;
     param._type = unargs__typeInt;
@@ -309,8 +304,6 @@ unargs_Param unargs_int(
 
 unargs_Param unargs_intReq(
     const char *name, const char *desc, int *dst) {
-    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
-
     unargs_Param param;
     param._name = name;
     param._type = unargs__typeInt;
@@ -323,8 +316,6 @@ unargs_Param unargs_intReq(
 
 unargs_Param unargs_unsigned(
     const char *name, const char *desc, unsigned def, unsigned *dst) {
-    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
-
     unargs_Param param;
     param._name = name;
     param._type = unargs__typeUnsigned;
@@ -338,8 +329,6 @@ unargs_Param unargs_unsigned(
 
 unargs_Param unargs_unsignedReq(
     const char *name, const char *desc, unsigned *dst) {
-    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
-
     unargs_Param param;
     param._name = name;
     param._type = unargs__typeUnsigned;
@@ -352,8 +341,6 @@ unargs_Param unargs_unsignedReq(
 
 unargs_Param unargs_float(
     const char *name, const char *desc, float def, float *dst) {
-    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
-
     unargs_Param param;
     param._name = name;
     param._type = unargs__typeFloat;
@@ -367,8 +354,6 @@ unargs_Param unargs_float(
 
 unargs_Param unargs_floatReq(
     const char *name, const char *desc, float *dst) {
-    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
-
     unargs_Param param;
     param._name = name;
     param._type = unargs__typeFloat;
@@ -381,8 +366,6 @@ unargs_Param unargs_floatReq(
 
 unargs_Param unargs_string(
     const char *name, const char *desc, const char *def, const char **dst) {
-    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
-
     unargs_Param param;
     param._name = name;
     param._type = unargs__typeString;
@@ -396,8 +379,6 @@ unargs_Param unargs_string(
 
 unargs_Param unargs_stringReq(
     const char *name, const char *desc, const char **dst) {
-    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
-
     unargs_Param param;
     param._name = name;
     param._type = unargs__typeString;
@@ -416,20 +397,71 @@ bool unargs__paramIsPos(const unargs_Param *param) {
     return param->_name == NULL;
 }
 
-void unargs__printErrorPrefix(void) {
+void unargs__printErrorParamsPrefix(void) {
+    UNARGS_PRINT_ERR_STR("Parameter error: ");
+}
+
+void unargs__printErrorArgsPrefix(void) {
     UNARGS_PRINT_ERR_STR("Error: ");
 }
 
-void unargs__verifyParams(int len, const unargs_Param *params) {
-    UNARGS_ASSERT(len >= 0);
-    if (len > 0) UNARGS_ASSERT(params != NULL);
+unargs_Status unargs__verifyParams(int len, const unargs_Param *params) {
+    if (len < 0) {
+        unargs__printErrorParamsPrefix();
+        UNARGS_PRINT_ERR_STR("Parameter length must be non-negative, but is ");
+        UNARGS_PRINT_ERR_INT(len);
+        UNARGS_PRINT_ERR_STR(".");
+        UNARGS_PRINT_ERR_LN();
+
+        return UNARGS_ERR_PARAMS;
+    }
+    if (len > 0 && params == NULL) {
+        unargs__printErrorParamsPrefix();
+        UNARGS_PRINT_ERR_STR(
+            "Parameter array must not be null when length is non-zero.");
+        UNARGS_PRINT_ERR_LN();
+
+        return UNARGS_ERR_PARAMS;
+    }
+
+    for (int i = 0; i < len; ++i) {
+        const unargs_Param *param = &params[i];
+
+        if (param->_type == unargs__typeBool) {
+            if (param->_name == NULL || strlen(param->_name) == 0) {
+                unargs__printErrorParamsPrefix();
+                UNARGS_PRINT_ERR_STR(
+                    "Bool parameter names must not be null or empty.");
+                UNARGS_PRINT_ERR_LN();
+
+                return UNARGS_ERR_PARAMS;
+            }
+        } else {
+            if (param->_name != NULL && strlen(param->_name) == 0) {
+                unargs__printErrorParamsPrefix();
+                UNARGS_PRINT_ERR_STR(
+                    "Parameter names must not be empty."
+                    " To make a parameter positional,"
+                    " declare its name as null.");
+                UNARGS_PRINT_ERR_LN();
+
+                return UNARGS_ERR_PARAMS;
+            }
+        }
+    }
 
     bool posNonReqFound = false;
     for (int i = 0; i < len; ++i) {
         if (unargs__paramIsPos(&params[i])) {
             if (params[i]._req) {
-                UNARGS_ASSERT(!posNonReqFound &&
-                    "Required positionals must preceed non-required ones.");
+                if (posNonReqFound) {
+                    unargs__printErrorParamsPrefix();
+                    UNARGS_PRINT_ERR_STR(
+                        "Required positionals must preceed non-required ones.");
+                    UNARGS_PRINT_ERR_LN();
+
+                    return UNARGS_ERR_PARAMS;
+                }
             } else {
                 posNonReqFound = true;
             }
@@ -442,19 +474,33 @@ void unargs__verifyParams(int len, const unargs_Param *params) {
         for (int j = i + 1; j < len; ++j) {
             if (!unargs__paramIsOpt(&params[j])) continue;
 
-            UNARGS_ASSERT(strcmp(params[i]._name, params[j]._name) != 0 &&
-                "Names of options must be unique.");
+            if (strcmp(params[i]._name, params[j]._name) == 0) {
+                unargs__printErrorParamsPrefix();
+                UNARGS_PRINT_ERR_STR("Names of options must be unique.");
+                UNARGS_PRINT_ERR_STR(" Option ");
+                UNARGS_PRINT_ERR_STR(params[i]._name);
+                UNARGS_PRINT_ERR_STR(" appears multiple times.");
+                UNARGS_PRINT_ERR_LN();
+
+                return UNARGS_ERR_PARAMS;
+            }
         }
     }
 
     for (int i = 0; i < len; ++i) {
         for (int j = i + 1; j < len; ++j) {
-            if (params[i]._dst != NULL && params[j]._dst != NULL) {
-                UNARGS_ASSERT(params[i]._dst != params[j]._dst &&
+            if (params[i]._dst != NULL && params[i]._dst == params[j]._dst) {
+                unargs__printErrorParamsPrefix();
+                UNARGS_PRINT_ERR_STR(
                     "Value destinations must be unique (unless null).");
+                UNARGS_PRINT_ERR_LN();
+
+                return UNARGS_ERR_PARAMS;
             }
         }
     }
+
+    return UNARGS_OK;
 }
 
 bool unargs__isOpt(const char *arg) {
@@ -467,14 +513,14 @@ const char* unargs__optName(const char *arg) {
 
 unargs_Status unargs__verifyArgs(int argc, char * const *argv) {
     if (argc < 1) {
-        unargs__printErrorPrefix();
+        unargs__printErrorArgsPrefix();
         UNARGS_PRINT_ERR_STR("At least one argument expected (program name).");
         UNARGS_PRINT_ERR_LN();
 
         return UNARGS_ERR_ARGS;
     }
     if (argv == NULL) {
-        unargs__printErrorPrefix();
+        unargs__printErrorArgsPrefix();
         UNARGS_PRINT_ERR_STR("argv must not be null.");
         UNARGS_PRINT_ERR_LN();
 
@@ -482,7 +528,7 @@ unargs_Status unargs__verifyArgs(int argc, char * const *argv) {
     }
     for (int i = 0; i < argc; ++i) {
         if (argv[i] == NULL) {
-            unargs__printErrorPrefix();
+            unargs__printErrorArgsPrefix();
             UNARGS_PRINT_ERR_STR("argv[");
             UNARGS_PRINT_ERR_INT(i);
             UNARGS_PRINT_ERR_STR("] is null.");
@@ -491,7 +537,7 @@ unargs_Status unargs__verifyArgs(int argc, char * const *argv) {
             return UNARGS_ERR_ARGS;
         }
         if (strlen(argv[i]) == 0) {
-            unargs__printErrorPrefix();
+            unargs__printErrorArgsPrefix();
             UNARGS_PRINT_ERR_STR("argv[");
             UNARGS_PRINT_ERR_INT(i);
             UNARGS_PRINT_ERR_STR("] is empty.");
@@ -550,7 +596,7 @@ unargs_Status unargs__parseLong(const char *arg, long *l) {
     errno = 0;
     *l = strtol(arg, &end, 0);
     if (errno != 0 || *end != '\0') {
-        unargs__printErrorPrefix();
+        unargs__printErrorArgsPrefix();
         UNARGS_PRINT_ERR_STR("Could not parse integer value from '");
         UNARGS_PRINT_ERR_STR(arg);
         UNARGS_PRINT_ERR_STR("'.");
@@ -567,7 +613,7 @@ unargs_Status unargs__parseUnsignedLong(const char *arg, unsigned long *ul) {
     errno = 0;
     *ul = strtoul(arg, &end, 0);
     if (errno != 0 || *end != '\0') {
-        unargs__printErrorPrefix();
+        unargs__printErrorArgsPrefix();
         UNARGS_PRINT_ERR_STR(
             "Could not parse non-negative integer value from '");
         UNARGS_PRINT_ERR_STR(arg);
@@ -585,7 +631,7 @@ unargs_Status unargs__parseFloat(const char *arg, float *f) {
     errno = 0;
     *f = strtof(arg, &end);
     if (errno != 0 || *end != '\0') {
-        unargs__printErrorPrefix();
+        unargs__printErrorArgsPrefix();
         UNARGS_PRINT_ERR_STR("Could not parse float value from '");
         UNARGS_PRINT_ERR_STR(arg);
         UNARGS_PRINT_ERR_STR("'.");
@@ -606,7 +652,7 @@ unargs_Status unargs__parseVal(const char *str, const unargs_Param *param) {
 
         int i = (int)l;
         if (i != l) {
-            unargs__printErrorPrefix();
+            unargs__printErrorArgsPrefix();
             UNARGS_PRINT_ERR_STR("Could not fit value ");
             UNARGS_PRINT_ERR_STR(str);
             UNARGS_PRINT_ERR_STR(" inside an int.");
@@ -624,7 +670,7 @@ unargs_Status unargs__parseVal(const char *str, const unargs_Param *param) {
 
         unsigned u = (unsigned)ul;
         if (u != ul) {
-            unargs__printErrorPrefix();
+            unargs__printErrorArgsPrefix();
             UNARGS_PRINT_ERR_STR("Could not fit value ");
             UNARGS_PRINT_ERR_STR(str);
             UNARGS_PRINT_ERR_STR(" inside an unsigned.");
@@ -671,7 +717,7 @@ unargs_Status unargs__parseArgs(
                     param = &params[p];
 
                     if (param->_found) {
-                        unargs__printErrorPrefix();
+                        unargs__printErrorArgsPrefix();
                         UNARGS_PRINT_ERR_STR("Option '");
                         UNARGS_PRINT_ERR_STR(param->_name);
                         UNARGS_PRINT_ERR_STR("' provided more than once.");
@@ -684,7 +730,7 @@ unargs_Status unargs__parseArgs(
                         if (param->_dst != NULL) *(bool*)param->_dst = true;
                     } else {
                         if (a + 1 >= argc) {
-                            unargs__printErrorPrefix();
+                            unargs__printErrorArgsPrefix();
                             UNARGS_PRINT_ERR_STR("Value not provided for '-");
                             UNARGS_PRINT_ERR_STR(param->_name);
                             UNARGS_PRINT_ERR_STR("'.");
@@ -703,7 +749,7 @@ unargs_Status unargs__parseArgs(
             }
 
             if (param == NULL) {
-                unargs__printErrorPrefix();
+                unargs__printErrorArgsPrefix();
                 UNARGS_PRINT_ERR_STR("Found unknown option '-");
                 UNARGS_PRINT_ERR_STR(unargs__optName(argv[a]));
                 UNARGS_PRINT_ERR_STR("'.");
@@ -715,7 +761,7 @@ unargs_Status unargs__parseArgs(
             a += unargs__argCnt(param);
         } else {
             if (nextPos >= len) {
-                unargs__printErrorPrefix();
+                unargs__printErrorArgsPrefix();
                 UNARGS_PRINT_ERR_STR("Found too many positional arguments,");
                 UNARGS_PRINT_ERR_STR(" starting at '");
                 UNARGS_PRINT_ERR_STR(argv[a]);
@@ -743,7 +789,7 @@ unargs_Status unargs__parseArgs(
         const unargs_Param *param = &params[p];
 
         if (param->_req && !param->_found) {
-            unargs__printErrorPrefix();
+            unargs__printErrorArgsPrefix();
             if (unargs__paramIsOpt(param)) {
                 UNARGS_PRINT_ERR_STR("Required option '-");
                 UNARGS_PRINT_ERR_STR(param->_name);
@@ -766,7 +812,9 @@ unargs_Status unargs__parseArgs(
 unargs_Status unargs_parse(
     int argc, char * const *argv,
     int len, unargs_Param *params) {
-    unargs__verifyParams(len, params);
+    if (unargs__verifyParams(len, params) != UNARGS_OK) {
+        return UNARGS_ERR_PARAMS;
+    }
     if (unargs__verifyArgs(argc, argv) != UNARGS_OK) {
         return UNARGS_ERR_ARGS;
     }
@@ -800,9 +848,12 @@ void unargs__printDef(const unargs_Param *param) {
 
 void unargs__printUsage(
     const char *program, int len, const unargs_Param *params) {
-    UNARGS_PRINT_OUT_STR("Usage: ");
+    UNARGS_PRINT_OUT_STR("Usage:");
 
-    if (program != NULL) UNARGS_PRINT_OUT_STR(program);
+    if (program != NULL) {
+        UNARGS_PRINT_OUT_STR(" ");
+        UNARGS_PRINT_OUT_STR(program);
+    }
 
     for (int i = 0; i < len; ++i) {
         const unargs_Param *param = &params[i];
@@ -937,7 +988,9 @@ void unargs__printOptions(int len, const unargs_Param *params) {
 unargs_Status unargs_help(
     const char *program,
     int len, const unargs_Param *params) {
-    unargs__verifyParams(len, params);
+    if (unargs__verifyParams(len, params) != UNARGS_OK) {
+        return UNARGS_ERR_PARAMS;
+    }
 
     unargs__printUsage(program, len, params);
     unargs__printPositionals(len, params);
