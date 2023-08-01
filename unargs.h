@@ -214,6 +214,7 @@ struct unargs_Param {
 
 #ifdef UNARGS_IMPLEMENTATION
 
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
