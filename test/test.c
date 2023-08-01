@@ -1,17 +1,13 @@
 #define UNARGS_PRINT_OUT_INT(x)
 #define UNARGS_PRINT_OUT_UNSIGNED(x)
-#define UNARGS_PRINT_OUT_LONG(x)
 #define UNARGS_PRINT_OUT_FLOAT(x)
-#define UNARGS_PRINT_OUT_DOUBLE(x)
 #define UNARGS_PRINT_OUT_STR(x)
 #define UNARGS_PRINT_OUT_TAB()
 #define UNARGS_PRINT_OUT_LN()
 
 #define UNARGS_PRINT_ERR_INT(x)
 #define UNARGS_PRINT_ERR_UNSIGNED(x)
-#define UNARGS_PRINT_ERR_LONG(x)
 #define UNARGS_PRINT_ERR_FLOAT(x)
-#define UNARGS_PRINT_ERR_DOUBLE(x)
 #define UNARGS_PRINT_ERR_STR(x)
 #define UNARGS_PRINT_ERR_TAB()
 #define UNARGS_PRINT_ERR_LN()
@@ -117,18 +113,14 @@ int testTypes(void) {
         "-b",
         "-i", "1",
         "-u", "2",
-        "-l", "3",
         "-f", "1.0",
-        "-d", "2.0",
         "-str", "foo",
     };
 
     bool b, bdef;
     int i, idef;
     unsigned u, udef;
-    long l, ldef;
     float f, fdef;
-    double d, ddef;
     const char *str, *strdef;
 
     unargs_Param params[] = {
@@ -138,12 +130,8 @@ int testTypes(void) {
         unargs_int("idef", NULL, -1, &idef),
         unargs_unsignedReq("u", NULL, &u),
         unargs_unsigned("udef", NULL, (unsigned)-2, &udef),
-        unargs_longReq("l", NULL, &l),
-        unargs_long("ldef", NULL, -3, &ldef),
         unargs_floatReq("f", NULL, &f),
         unargs_float("fdef", NULL, -1.0f, &fdef),
-        unargs_doubleReq("d", NULL, &d),
-        unargs_double("ddef", NULL, -2.0, &ddef),
         unargs_stringReq("str", NULL, &str),
         unargs_string("strdef", NULL, "bar", &strdef),
     };
@@ -161,12 +149,8 @@ int testTypes(void) {
     EXPECT_EQ(idef, -1);
     EXPECT_EQ(u, 2);
     EXPECT_EQ(udef, (unsigned)-2);
-    EXPECT_EQ(l, 3);
-    EXPECT_EQ(ldef, -3);
     EXPECT_EQ(f, 1.0f);
     EXPECT_EQ(fdef, -1.0f);
-    EXPECT_EQ(d, 2.0);
-    EXPECT_EQ(ddef, -2.0);
     EXPECT_STR_EQ(str, "foo");
     EXPECT_STR_EQ(strdef, "bar");
 
@@ -184,12 +168,8 @@ int testHelp(void) {
         unargs_int("idef", NULL, 1, NULL),
         unargs_unsignedReq("u", "desc", NULL),
         unargs_unsigned("udef", NULL, 1, NULL),
-        unargs_longReq("l", NULL, NULL),
-        unargs_long("ldef", "desc", 1, NULL),
         unargs_floatReq("f", NULL, NULL),
         unargs_float("fdef", NULL, 0.0f, NULL),
-        unargs_doubleReq("d", NULL, NULL),
-        unargs_double("ddef", NULL, 0.0, NULL),
         unargs_stringReq("str", NULL, NULL),
         unargs_string("strdef0", NULL, "1", NULL),
         unargs_string("strdef1", NULL, "", NULL),
@@ -197,15 +177,11 @@ int testHelp(void) {
 
         unargs_intReq(NULL, NULL, NULL),
         unargs_unsignedReq(NULL, NULL, NULL),
-        unargs_longReq(NULL, NULL, NULL),
         unargs_floatReq(NULL, "desc", NULL),
-        unargs_doubleReq(NULL, NULL, NULL),
         unargs_stringReq(NULL, NULL, NULL),
         unargs_int(NULL, NULL, 1, NULL),
         unargs_unsigned(NULL, NULL, 1, NULL),
-        unargs_long(NULL, NULL, 1, NULL),
         unargs_float(NULL, NULL, 0.0f, NULL),
-        unargs_double(NULL, "desc", 0.0, NULL),
         unargs_string(NULL, NULL, "1", NULL),
         unargs_string(NULL, NULL, "", NULL),
         unargs_string(NULL, NULL, NULL, NULL),

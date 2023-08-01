@@ -146,23 +146,11 @@ unargs_Param unargs_unsigned(
 unargs_Param unargs_unsignedReq(
     const char *name, const char *desc, unsigned *dst);
 
-unargs_Param unargs_long(
-    const char *name, const char *desc, long def, long *dst);
-
-unargs_Param unargs_longReq(
-    const char *name, const char *desc, long *dst);
-
 unargs_Param unargs_float(
     const char *name, const char *desc, float def, float *dst);
 
 unargs_Param unargs_floatReq(
     const char *name, const char *desc, float *dst);
-
-unargs_Param unargs_double(
-    const char *name, const char *desc, double def, double *dst);
-
-unargs_Param unargs_doubleReq(
-    const char *name, const char *desc, double *dst);
 
 unargs_Param unargs_string(
     const char *name, const char *desc, const char *def, const char **dst);
@@ -182,9 +170,7 @@ enum unargs__Type {
     unargs__typeBool,
     unargs__typeInt,
     unargs__typeUnsigned,
-    unargs__typeLong,
     unargs__typeFloat,
-    unargs__typeDouble,
     unargs__typeString
 };
 
@@ -197,9 +183,7 @@ struct unargs_Param {
         bool b;
         int i;
         unsigned u;
-        long l;
         float f;
-        double d;
         const char *str;
     } _def;
 
@@ -233,19 +217,9 @@ struct unargs_Param {
 #define UNARGS_PRINT_OUT_UNSIGNED(x) fprintf(stdout, "%u", x)
 #endif
 
-#if !defined(UNARGS_PRINT_OUT_LONG)
-#include <stdio.h>
-#define UNARGS_PRINT_OUT_LONG(x) fprintf(stdout, "%ld", x)
-#endif
-
 #if !defined(UNARGS_PRINT_OUT_FLOAT)
 #include <stdio.h>
 #define UNARGS_PRINT_OUT_FLOAT(x) fprintf(stdout, "%f", x)
-#endif
-
-#if !defined(UNARGS_PRINT_OUT_DOUBLE)
-#include <stdio.h>
-#define UNARGS_PRINT_OUT_DOUBLE(x) fprintf(stdout, "%f", x)
 #endif
 
 #if !defined(UNARGS_PRINT_OUT_STR)
@@ -273,19 +247,9 @@ struct unargs_Param {
 #define UNARGS_PRINT_ERR_UNSIGNED(x) fprintf(stderr, "%u", x)
 #endif
 
-#if !defined(UNARGS_PRINT_ERR_LONG)
-#include <stdio.h>
-#define UNARGS_PRINT_ERR_LONG(x) fprintf(stderr, "%ld", x)
-#endif
-
 #if !defined(UNARGS_PRINT_ERR_FLOAT)
 #include <stdio.h>
 #define UNARGS_PRINT_ERR_FLOAT(x) fprintf(stderr, "%f", x)
-#endif
-
-#if !defined(UNARGS_PRINT_ERR_DOUBLE)
-#include <stdio.h>
-#define UNARGS_PRINT_ERR_DOUBLE(x) fprintf(stderr, "%f", x)
 #endif
 
 #if !defined(UNARGS_PRINT_ERR_STR)
@@ -377,35 +341,6 @@ unargs_Param unargs_unsignedReq(
     return param;
 }
 
-unargs_Param unargs_long(
-    const char *name, const char *desc, long def, long *dst) {
-    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
-
-    unargs_Param param;
-    param._name = name;
-    param._type = unargs__typeLong;
-    param._req = false;
-    param._desc = desc;
-    param._def.l = def;
-    param._dst = dst;
-
-    return param;
-}
-
-unargs_Param unargs_longReq(
-    const char *name, const char *desc, long *dst) {
-    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
-
-    unargs_Param param;
-    param._name = name;
-    param._type = unargs__typeLong;
-    param._req = true;
-    param._desc = desc;
-    param._dst = dst;
-
-    return param;
-}
-
 unargs_Param unargs_float(
     const char *name, const char *desc, float def, float *dst) {
     if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
@@ -428,35 +363,6 @@ unargs_Param unargs_floatReq(
     unargs_Param param;
     param._name = name;
     param._type = unargs__typeFloat;
-    param._req = true;
-    param._desc = desc;
-    param._dst = dst;
-
-    return param;
-}
-
-unargs_Param unargs_double(
-    const char *name, const char *desc, double def, double *dst) {
-    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
-
-    unargs_Param param;
-    param._name = name;
-    param._type = unargs__typeDouble;
-    param._req = false;
-    param._desc = desc;
-    param._def.d = def;
-    param._dst = dst;
-
-    return param;
-}
-
-unargs_Param unargs_doubleReq(
-    const char *name, const char *desc, double *dst) {
-    if (name != NULL) UNARGS_ASSERT(strlen(name) > 0);
-
-    unargs_Param param;
-    param._name = name;
-    param._type = unargs__typeDouble;
     param._req = true;
     param._desc = desc;
     param._dst = dst;
@@ -601,12 +507,8 @@ void unargs__writeDef(unargs_Param *param) {
         if (param->_dst != NULL) *(int*)param->_dst = param->_def.i;
     } else if (param->_type == unargs__typeUnsigned) {
         if (param->_dst != NULL) *(unsigned*)param->_dst = param->_def.u;
-    } else if (param->_type == unargs__typeLong) {
-        if (param->_dst != NULL) *(long*)param->_dst = param->_def.l;
     } else if (param->_type == unargs__typeFloat) {
         if (param->_dst != NULL) *(float*)param->_dst = param->_def.f;
-    } else if (param->_type == unargs__typeDouble) {
-        if (param->_dst != NULL) *(double*)param->_dst = param->_def.d;
     } else if (param->_type == unargs__typeString) {
         if (param->_dst != NULL) *(const char**)param->_dst = param->_def.str;
     } else {
@@ -617,9 +519,7 @@ void unargs__writeDef(unargs_Param *param) {
 void unargs__printTypeOut(enum unargs__Type type) {
     if (type == unargs__typeInt) UNARGS_PRINT_OUT_STR("<int>");
     else if (type == unargs__typeUnsigned) UNARGS_PRINT_OUT_STR("<unsigned>");
-    else if (type == unargs__typeLong) UNARGS_PRINT_OUT_STR("<long>");
     else if (type == unargs__typeFloat) UNARGS_PRINT_OUT_STR("<float>");
-    else if (type == unargs__typeDouble) UNARGS_PRINT_OUT_STR("<double>");
     else if (type == unargs__typeString) UNARGS_PRINT_OUT_STR("<string>");
     else UNARGS_ASSERT(false);
 }
@@ -627,9 +527,7 @@ void unargs__printTypeOut(enum unargs__Type type) {
 void unargs__printTypeErr(enum unargs__Type type) {
     if (type == unargs__typeInt) UNARGS_PRINT_ERR_STR("<int>");
     else if (type == unargs__typeUnsigned) UNARGS_PRINT_ERR_STR("<unsigned>");
-    else if (type == unargs__typeLong) UNARGS_PRINT_ERR_STR("<long>");
     else if (type == unargs__typeFloat) UNARGS_PRINT_ERR_STR("<float>");
-    else if (type == unargs__typeDouble) UNARGS_PRINT_ERR_STR("<double>");
     else if (type == unargs__typeString) UNARGS_PRINT_ERR_STR("<string>");
     else UNARGS_ASSERT(false);
 }
@@ -683,22 +581,6 @@ int unargs__parseFloat(const char *str, float *f) {
     return 0;
 }
 
-int unargs__parseDouble(const char *str, double *d) {
-    char *end;
-    errno = 0;
-    *d = strtod(str, &end);
-    if (errno != 0 || *end != '\0') {
-        unargs__printErrorPrefix();
-        UNARGS_PRINT_ERR_STR("Could not parse double value from '");
-        UNARGS_PRINT_ERR_STR(str);
-        UNARGS_PRINT_ERR_STR("'.");
-        UNARGS_PRINT_ERR_LN();
-        return -1;
-    }
-
-    return 0;
-}
-
 int unargs__parseVal(const char *str, const unargs_Param *param) {
     if (param->_type == unargs__typeInt) {
         long l;
@@ -730,21 +612,11 @@ int unargs__parseVal(const char *str, const unargs_Param *param) {
         }
 
         if (param->_dst != NULL) *(unsigned*)param->_dst = u;
-    } else if (param->_type == unargs__typeLong) {
-        long l;
-        if (unargs__parseLong(str, &l) < 0) return -1;
-
-        if (param->_dst != NULL) *(long*)param->_dst = l;
     } else if (param->_type == unargs__typeFloat) {
         float f;
         if (unargs__parseFloat(str, &f) < 0) return -1;
 
         if (param->_dst != NULL) *(float*)param->_dst = f;
-    } else if (param->_type == unargs__typeDouble) {
-        double d;
-        if (unargs__parseDouble(str, &d) < 0) return -1;
-
-        if (param->_dst != NULL) *(double*)param->_dst = d;
     } else if (param->_type == unargs__typeString) {
         if (param->_dst != NULL) *(const char**)param->_dst = str;
     } else {
@@ -878,12 +750,8 @@ void unargs__printDef(const unargs_Param *param) {
         UNARGS_PRINT_OUT_INT(param->_def.i);
     } else if (param->_type == unargs__typeUnsigned) {
         UNARGS_PRINT_OUT_UNSIGNED(param->_def.u);
-    } else if (param->_type == unargs__typeLong) {
-        UNARGS_PRINT_OUT_LONG(param->_def.l);
     } else if (param->_type == unargs__typeFloat) {
         UNARGS_PRINT_OUT_FLOAT(param->_def.f);
-    } else if (param->_type == unargs__typeDouble) {
-        UNARGS_PRINT_OUT_DOUBLE(param->_def.d);
     } else if (param->_type == unargs__typeString) {
         if (param->_def.str == NULL) {
             UNARGS_PRINT_OUT_STR("<null>");
