@@ -128,8 +128,6 @@ You can also define UNARGS_ASSERT(x) if you don't want unargs to use C's assert.
 
 #include <stdbool.h>
 
-// @TODO doc comments
-
 enum {
     // Call was successful.
     unargs_ok = 0,
@@ -314,10 +312,54 @@ unargs_Param unargs_string(
 unargs_Param unargs_stringReq(
     const char *name, const char *desc, const char **dst);
 
+/**
+ * Parses \c main function's arguments and assigns them (or the default values)
+ * to the destinations of parameters.
+ *
+ * It will verify that parameters and arguments are well-formed. If not, an
+ * error code is returned. Error messages will be printed out using
+ * UNARGS_PRINT_ERR_* macros.
+ *
+ * \param argc Number of arguments in \c argv. You probably want to pass the
+ * first argument to \c main here. Must be at least 1.
+ *
+ * \param argv Array of arguments from the command-line. You probably want to
+ * pass the second argument to \c main here. Must not be null. All elements must
+ * not be null.
+ *
+ * \param len Number of parameters in \c params. Must be non-negative.
+ *
+ * \param params Array of arguments created with \c unargs_<type> and
+ * \c unargs_<type>Req functions. If \c len is positive, must not be null.
+ *
+ * \returns On success, returns \c unargs_ok (zero). On failure, returns a
+ * non-zero value: \c unargs_err_args if user arguments are not well-formed,
+ * \c unargs_err_params if parameters in \c params are not well-formed.
+ */
 int unargs_parse(
     int argc, char * const *argv,
     int len, unargs_Param *params);
 
+/**
+ * Prints a helpful text on how to use the program with the specified
+ * parameters. Uses UNARGS_PRINT_OUT_* macros.
+ *
+ * It will verify that parameters are well-formed. If not, an error code is
+ * returned. Error messages will be printed out using UNARGS_PRINT_ERR_* macros.
+ *
+ * \param program Name of your program to be listed as the zeroth argument.
+ * \c main function's zeroth argument \c argv[0] usually corresponds to this in
+ * some way.
+ *
+ * \param len Number of parameters in \c params. Must be non-negative.
+ *
+ * \param params Array of arguments created with \c unargs_<type> and
+ * \c unargs_<type>Req functions. If \c len is positive, must not be null.
+ *
+ * \returns On success, returns \c unargs_ok (zero). On failure, returns a
+ * non-zero value - \c unargs_err_params if parameters in \c params are not
+ * well-formed.
+ */
 int unargs_help(
     const char *program,
     int len, const unargs_Param *params);
@@ -663,7 +705,8 @@ const char* unargs__optName(const char *arg) {
 int unargs__verifyArgs(int argc, char * const *argv) {
     if (argc < 1) {
         unargs__printErrorArgsPrefix();
-        UNARGS_PRINT_ERR_STR("At least one argument expected (program name).");
+        UNARGS_PRINT_ERR_STR(
+            "At least one argument expected (the program name).");
         UNARGS_PRINT_ERR_LN();
 
         return unargs_err_args;
