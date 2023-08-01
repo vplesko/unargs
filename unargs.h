@@ -130,11 +130,11 @@ You can also define UNARGS_ASSERT(x) if you don't want unargs to use C's assert.
 
 // @TODO doc comments
 
-typedef enum unargs_Status {
+enum {
     unargs_ok = 0,
     unargs_err_args = -1,
     unargs_err_params = -2
-} unargs_Status;
+};
 
 typedef struct unargs_Param unargs_Param;
 
@@ -165,11 +165,11 @@ unargs_Param unargs_string(
 unargs_Param unargs_stringReq(
     const char *name, const char *desc, const char **dst);
 
-unargs_Status unargs_parse(
+int unargs_parse(
     int argc, char * const *argv,
     int len, unargs_Param *params);
 
-unargs_Status unargs_help(
+int unargs_help(
     const char *program,
     int len, const unargs_Param *params);
 
@@ -405,7 +405,7 @@ void unargs__printErrorArgsPrefix(void) {
     UNARGS_PRINT_ERR_STR("Error: ");
 }
 
-unargs_Status unargs__verifyParams(int len, const unargs_Param *params) {
+int unargs__verifyParams(int len, const unargs_Param *params) {
     if (len < 0) {
         unargs__printErrorParamsPrefix();
         UNARGS_PRINT_ERR_STR("Parameter length must be non-negative, but is ");
@@ -511,7 +511,7 @@ const char* unargs__optName(const char *arg) {
     return arg + 1;
 }
 
-unargs_Status unargs__verifyArgs(int argc, char * const *argv) {
+int unargs__verifyArgs(int argc, char * const *argv) {
     if (argc < 1) {
         unargs__printErrorArgsPrefix();
         UNARGS_PRINT_ERR_STR("At least one argument expected (program name).");
@@ -591,7 +591,7 @@ void unargs__printTypeErr(enum unargs__Type type) {
     else UNARGS_ASSERT(false);
 }
 
-unargs_Status unargs__parseLong(const char *arg, long *l) {
+int unargs__parseLong(const char *arg, long *l) {
     char *end;
     errno = 0;
     *l = strtol(arg, &end, 0);
@@ -608,7 +608,7 @@ unargs_Status unargs__parseLong(const char *arg, long *l) {
     return unargs_ok;
 }
 
-unargs_Status unargs__parseUnsignedLong(const char *arg, unsigned long *ul) {
+int unargs__parseUnsignedLong(const char *arg, unsigned long *ul) {
     char *end;
     errno = 0;
     *ul = strtoul(arg, &end, 0);
@@ -626,7 +626,7 @@ unargs_Status unargs__parseUnsignedLong(const char *arg, unsigned long *ul) {
     return unargs_ok;
 }
 
-unargs_Status unargs__parseFloat(const char *arg, float *f) {
+int unargs__parseFloat(const char *arg, float *f) {
     char *end;
     errno = 0;
     *f = strtof(arg, &end);
@@ -643,7 +643,7 @@ unargs_Status unargs__parseFloat(const char *arg, float *f) {
     return unargs_ok;
 }
 
-unargs_Status unargs__parseVal(const char *str, const unargs_Param *param) {
+int unargs__parseVal(const char *str, const unargs_Param *param) {
     if (param->_type == unargs__typeInt) {
         long l;
         if (unargs__parseLong(str, &l) != unargs_ok) {
@@ -696,7 +696,7 @@ unargs_Status unargs__parseVal(const char *str, const unargs_Param *param) {
     return unargs_ok;
 }
 
-unargs_Status unargs__parseArgs(
+int unargs__parseArgs(
     int argc, char * const *argv,
     int len, unargs_Param *params) {
     for (int p = 0; p < len; ++p) {
@@ -809,7 +809,7 @@ unargs_Status unargs__parseArgs(
     return unargs_ok;
 }
 
-unargs_Status unargs_parse(
+int unargs_parse(
     int argc, char * const *argv,
     int len, unargs_Param *params) {
     if (unargs__verifyParams(len, params) != unargs_ok) {
@@ -985,7 +985,7 @@ void unargs__printOptions(int len, const unargs_Param *params) {
     }
 }
 
-unargs_Status unargs_help(
+int unargs_help(
     const char *program,
     int len, const unargs_Param *params) {
     if (unargs__verifyParams(len, params) != unargs_ok) {
