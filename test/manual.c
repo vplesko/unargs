@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     };
     int len = sizeof(params) / sizeof(*params);
 
-    if (unargs_parse(argc, argv, len, params) < 0) {
+    if (unargs_parse(argc, argv, len, params) != UNARGS_OK) {
         fprintf(stderr, "\n");
         unargs_help("manual", len, params);
 

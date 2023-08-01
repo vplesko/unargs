@@ -85,7 +85,7 @@ int testBasic(void) {
 
     if (unargs_parse(
             sizeof(argv) / sizeof(*argv), argv,
-            sizeof(params) / sizeof(*params), params) < 0) {
+            sizeof(params) / sizeof(*params), params) != UNARGS_OK) {
         PRINT_TEST_FAIL();
         return -1;
     }
@@ -138,7 +138,7 @@ int testTypes(void) {
 
     if (unargs_parse(
             sizeof(argv) / sizeof(*argv), argv,
-            sizeof(params) / sizeof(*params), params) < 0) {
+            sizeof(params) / sizeof(*params), params) != UNARGS_OK) {
         PRINT_TEST_FAIL();
         return -1;
     }
@@ -224,7 +224,7 @@ int testScrambled(void) {
 
     if (unargs_parse(
             sizeof(argv) / sizeof(*argv), argv,
-            sizeof(params) / sizeof(*params), params) < 0) {
+            sizeof(params) / sizeof(*params), params) != UNARGS_OK) {
         PRINT_TEST_FAIL();
         return -1;
     }
@@ -253,7 +253,7 @@ int testBadArgs(void) {
 
         if (unargs_parse(
                 sizeof(argv) / sizeof(*argv), argv,
-                sizeof(params) / sizeof(*params), params) >= 0) {
+                sizeof(params) / sizeof(*params), params) != UNARGS_ERR_ARGS) {
             PRINT_TEST_FAIL();
             return -1;
         }
@@ -270,7 +270,7 @@ int testBadArgs(void) {
 
         if (unargs_parse(
                 sizeof(argv) / sizeof(*argv), argv,
-                sizeof(params) / sizeof(*params), params) >= 0) {
+                sizeof(params) / sizeof(*params), params) != UNARGS_ERR_ARGS) {
             PRINT_TEST_FAIL();
             return -1;
         }
@@ -287,7 +287,7 @@ int testBadArgs(void) {
 
         if (unargs_parse(
                 sizeof(argv) / sizeof(*argv), argv,
-                sizeof(params) / sizeof(*params), params) >= 0) {
+                sizeof(params) / sizeof(*params), params) != UNARGS_ERR_ARGS) {
             PRINT_TEST_FAIL();
             return -1;
         }
@@ -305,7 +305,7 @@ int testBadArgs(void) {
 
         if (unargs_parse(
                 sizeof(argv) / sizeof(*argv), argv,
-                sizeof(params) / sizeof(*params), params) >= 0) {
+                sizeof(params) / sizeof(*params), params) != UNARGS_ERR_ARGS) {
             PRINT_TEST_FAIL();
             return -1;
         }
@@ -323,7 +323,7 @@ int testBadArgs(void) {
 
         if (unargs_parse(
                 sizeof(argv) / sizeof(*argv), argv,
-                sizeof(params) / sizeof(*params), params) >= 0) {
+                sizeof(params) / sizeof(*params), params) != UNARGS_ERR_ARGS) {
             PRINT_TEST_FAIL();
             return -1;
         }
@@ -340,7 +340,7 @@ int testBadArgs(void) {
 
         if (unargs_parse(
                 sizeof(argv) / sizeof(*argv), argv,
-                sizeof(params) / sizeof(*params), params) >= 0) {
+                sizeof(params) / sizeof(*params), params) != UNARGS_ERR_ARGS) {
             PRINT_TEST_FAIL();
             return -1;
         }
@@ -356,7 +356,7 @@ int testBadArgs(void) {
 
         if (unargs_parse(
                 sizeof(argv) / sizeof(*argv), argv,
-                sizeof(params) / sizeof(*params), params) >= 0) {
+                sizeof(params) / sizeof(*params), params) != UNARGS_ERR_ARGS) {
             PRINT_TEST_FAIL();
             return -1;
         }
@@ -374,7 +374,7 @@ int testBadArgs(void) {
 
         if (unargs_parse(
                 sizeof(argv) / sizeof(*argv), argv,
-                sizeof(params) / sizeof(*params), params) >= 0) {
+                sizeof(params) / sizeof(*params), params) != UNARGS_ERR_ARGS) {
             PRINT_TEST_FAIL();
             return -1;
         }
@@ -392,7 +392,7 @@ int testBadArgs(void) {
 
         if (unargs_parse(
                 sizeof(argv) / sizeof(*argv), argv,
-                sizeof(params) / sizeof(*params), params) >= 0) {
+                sizeof(params) / sizeof(*params), params) != UNARGS_ERR_ARGS) {
             PRINT_TEST_FAIL();
             return -1;
         }
@@ -409,7 +409,7 @@ int testBadArgs(void) {
 
         if (unargs_parse(
                 0, argv,
-                sizeof(params) / sizeof(*params), params) >= 0) {
+                sizeof(params) / sizeof(*params), params) != UNARGS_ERR_ARGS) {
             PRINT_TEST_FAIL();
             return -1;
         }
@@ -421,7 +421,7 @@ int testBadArgs(void) {
 
         if (unargs_parse(
                 1, NULL,
-                sizeof(params) / sizeof(*params), params) >= 0) {
+                sizeof(params) / sizeof(*params), params) != UNARGS_ERR_ARGS) {
             PRINT_TEST_FAIL();
             return -1;
         }
@@ -438,7 +438,7 @@ int testBadArgs(void) {
 
         if (unargs_parse(
                 sizeof(argv) / sizeof(*argv), argv,
-                sizeof(params) / sizeof(*params), params) >= 0) {
+                sizeof(params) / sizeof(*params), params) != UNARGS_ERR_ARGS) {
             PRINT_TEST_FAIL();
             return -1;
         }

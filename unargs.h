@@ -86,7 +86,8 @@ Valid ways to call the program would then be:
     main 3333 -b 4444 -i1 1111 -i2 2222
     main -b 3333 -i2 2222 -i1 1111 4444
 
-unargs_parse returns 0 on success, non-zero on failure.
+unargs_parse and unargs_help return UNARGS_OK (0) on success, non-zero values on
+failure.
 
 Some terminology:
     parameter - part of your interface;
@@ -129,6 +130,13 @@ You can also define UNARGS_ASSERT(x) if you don't want unargs to use C's assert.
 
 // @TODO doc comments
 
+typedef enum unargs_Status {
+    UNARGS_OK = 0,
+    UNARGS_ERR = -1,
+    UNARGS_ERR_ARGS = -2,
+    UNARGS_ERR_PARAMS = -3
+} unargs_Status;
+
 typedef struct unargs_Param unargs_Param;
 
 unargs_Param unargs_bool(
@@ -158,11 +166,13 @@ unargs_Param unargs_string(
 unargs_Param unargs_stringReq(
     const char *name, const char *desc, const char **dst);
 
-int unargs_parse(
+unargs_Status unargs_parse(
     int argc, char * const *argv,
     int len, unargs_Param *params);
 
-void unargs_help(const char *program, int len, const unargs_Param *params);
+unargs_Status unargs_help(
+    const char *program,
+    int len, const unargs_Param *params);
 
 // Below are implementation details.
 
@@ -456,18 +466,20 @@ const char* unargs__optName(const char *arg) {
     return arg + 1;
 }
 
-int unargs__verifyArgs(int argc, char * const *argv) {
+unargs_Status unargs__verifyArgs(int argc, char * const *argv) {
     if (argc < 1) {
         unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR("At least one argument expected (program name).");
         UNARGS_PRINT_ERR_LN();
-        return -1;
+
+        return UNARGS_ERR_ARGS;
     }
     if (argv == NULL) {
         unargs__printErrorPrefix();
         UNARGS_PRINT_ERR_STR("argv must not be null.");
         UNARGS_PRINT_ERR_LN();
-        return -1;
+
+        return UNARGS_ERR_ARGS;
     }
     for (int i = 0; i < argc; ++i) {
         if (argv[i] == NULL) {
@@ -476,7 +488,8 @@ int unargs__verifyArgs(int argc, char * const *argv) {
             UNARGS_PRINT_ERR_INT(i);
             UNARGS_PRINT_ERR_STR("] is null.");
             UNARGS_PRINT_ERR_LN();
-            return -1;
+
+            return UNARGS_ERR_ARGS;
         }
         if (strlen(argv[i]) == 0) {
             unargs__printErrorPrefix();
@@ -484,11 +497,12 @@ int unargs__verifyArgs(int argc, char * const *argv) {
             UNARGS_PRINT_ERR_INT(i);
             UNARGS_PRINT_ERR_STR("] is empty.");
             UNARGS_PRINT_ERR_LN();
-            return -1;
+
+            return UNARGS_ERR_ARGS;
         }
     }
 
-    return 0;
+    return UNARGS_OK;
 }
 
 bool unargs__optNameMatches(const char *arg, const unargs_Param *param) {
@@ -532,7 +546,7 @@ void unargs__printTypeErr(enum unargs__Type type) {
     else UNARGS_ASSERT(false);
 }
 
-int unargs__parseLong(const char *str, long *l) {
+unargs_Status unargs__parseLong(const char *str, long *l) {
     char *end;
     errno = 0;
     *l = strtol(str, &end, 0);
@@ -542,13 +556,14 @@ int unargs__parseLong(const char *str, long *l) {
         UNARGS_PRINT_ERR_STR(str);
         UNARGS_PRINT_ERR_STR("'.");
         UNARGS_PRINT_ERR_LN();
-        return -1;
+
+        return UNARGS_ERR;
     }
 
-    return 0;
+    return UNARGS_OK;
 }
 
-int unargs__parseUnsignedLong(const char *str, unsigned long *ul) {
+unargs_Status unargs__parseUnsignedLong(const char *str, unsigned long *ul) {
     char *end;
     errno = 0;
     *ul = strtoul(str, &end, 0);
@@ -559,13 +574,14 @@ int unargs__parseUnsignedLong(const char *str, unsigned long *ul) {
         UNARGS_PRINT_ERR_STR(str);
         UNARGS_PRINT_ERR_STR("'.");
         UNARGS_PRINT_ERR_LN();
-        return -1;
+
+        return UNARGS_ERR;
     }
 
-    return 0;
+    return UNARGS_OK;
 }
 
-int unargs__parseFloat(const char *str, float *f) {
+unargs_Status unargs__parseFloat(const char *str, float *f) {
     char *end;
     errno = 0;
     *f = strtof(str, &end);
@@ -575,16 +591,19 @@ int unargs__parseFloat(const char *str, float *f) {
         UNARGS_PRINT_ERR_STR(str);
         UNARGS_PRINT_ERR_STR("'.");
         UNARGS_PRINT_ERR_LN();
-        return -1;
+
+        return UNARGS_ERR;
     }
 
-    return 0;
+    return UNARGS_OK;
 }
 
-int unargs__parseVal(const char *str, const unargs_Param *param) {
+unargs_Status unargs__parseVal(const char *str, const unargs_Param *param) {
     if (param->_type == unargs__typeInt) {
         long l;
-        if (unargs__parseLong(str, &l) < 0) return -1;
+        if (unargs__parseLong(str, &l) != UNARGS_OK) {
+            return UNARGS_ERR_ARGS;
+        }
 
         int i = (int)l;
         if (i != l) {
@@ -593,13 +612,16 @@ int unargs__parseVal(const char *str, const unargs_Param *param) {
             UNARGS_PRINT_ERR_STR(str);
             UNARGS_PRINT_ERR_STR(" inside an int.");
             UNARGS_PRINT_ERR_LN();
-            return -1;
+
+            return UNARGS_ERR_ARGS;
         }
 
         if (param->_dst != NULL) *(int*)param->_dst = i;
     } else if (param->_type == unargs__typeUnsigned) {
         unsigned long ul;
-        if (unargs__parseUnsignedLong(str, &ul) < 0) return -1;
+        if (unargs__parseUnsignedLong(str, &ul) != UNARGS_OK) {
+            return UNARGS_ERR_ARGS;
+        }
 
         unsigned u = (unsigned)ul;
         if (u != ul) {
@@ -608,13 +630,16 @@ int unargs__parseVal(const char *str, const unargs_Param *param) {
             UNARGS_PRINT_ERR_STR(str);
             UNARGS_PRINT_ERR_STR(" inside an unsigned.");
             UNARGS_PRINT_ERR_LN();
-            return -1;
+
+            return UNARGS_ERR_ARGS;
         }
 
         if (param->_dst != NULL) *(unsigned*)param->_dst = u;
     } else if (param->_type == unargs__typeFloat) {
         float f;
-        if (unargs__parseFloat(str, &f) < 0) return -1;
+        if (unargs__parseFloat(str, &f) != UNARGS_OK) {
+            return UNARGS_ERR_ARGS;
+        }
 
         if (param->_dst != NULL) *(float*)param->_dst = f;
     } else if (param->_type == unargs__typeString) {
@@ -623,10 +648,10 @@ int unargs__parseVal(const char *str, const unargs_Param *param) {
         UNARGS_ASSERT(false);
     }
 
-    return 0;
+    return UNARGS_OK;
 }
 
-int unargs__parseArgs(
+unargs_Status unargs__parseArgs(
     int argc, char * const *argv,
     int len, unargs_Param *params) {
     for (int p = 0; p < len; ++p) {
@@ -652,7 +677,8 @@ int unargs__parseArgs(
                         UNARGS_PRINT_ERR_STR(param->_name);
                         UNARGS_PRINT_ERR_STR("' provided more than once.");
                         UNARGS_PRINT_ERR_LN();
-                        return -1;
+
+                        return UNARGS_ERR_ARGS;
                     }
 
                     if (param->_type == unargs__typeBool) {
@@ -664,11 +690,12 @@ int unargs__parseArgs(
                             UNARGS_PRINT_ERR_STR(param->_name);
                             UNARGS_PRINT_ERR_STR("'.");
                             UNARGS_PRINT_ERR_LN();
-                            return -1;
+
+                            return UNARGS_ERR_ARGS;
                         }
 
-                        if (unargs__parseVal(argv[a + 1], param) < 0) {
-                            return -1;
+                        if (unargs__parseVal(argv[a + 1], param) != UNARGS_OK) {
+                            return UNARGS_ERR_ARGS;
                         }
                     }
 
@@ -682,7 +709,8 @@ int unargs__parseArgs(
                 UNARGS_PRINT_ERR_STR(unargs__optName(argv[a]));
                 UNARGS_PRINT_ERR_STR("'.");
                 UNARGS_PRINT_ERR_LN();
-                return -1;
+
+                return UNARGS_ERR_ARGS;
             }
 
             a += unargs__argCnt(param);
@@ -694,11 +722,12 @@ int unargs__parseArgs(
                 UNARGS_PRINT_ERR_STR(argv[a]);
                 UNARGS_PRINT_ERR_STR("'.");
                 UNARGS_PRINT_ERR_LN();
-                return -1;
+
+                return UNARGS_ERR_ARGS;
             }
 
-            if (unargs__parseVal(argv[a], &params[nextPos]) < 0) {
-                return -1;
+            if (unargs__parseVal(argv[a], &params[nextPos]) != UNARGS_OK) {
+                return UNARGS_ERR_ARGS;
             }
             params[nextPos]._found = true;
 
@@ -727,22 +756,27 @@ int unargs__parseArgs(
                 UNARGS_PRINT_ERR_STR(".");
             }
             UNARGS_PRINT_ERR_LN();
-            return -1;
+
+            return UNARGS_ERR_ARGS;
         }
     }
 
-    return 0;
+    return UNARGS_OK;
 }
 
-int unargs_parse(
+unargs_Status unargs_parse(
     int argc, char * const *argv,
     int len, unargs_Param *params) {
     unargs__verifyParams(len, params);
-    if (unargs__verifyArgs(argc, argv) < 0) return -1;
+    if (unargs__verifyArgs(argc, argv) != UNARGS_OK) {
+        return UNARGS_ERR_ARGS;
+    }
 
-    if (unargs__parseArgs(argc, argv, len, params) < 0) return -1;
+    if (unargs__parseArgs(argc, argv, len, params) != UNARGS_OK) {
+        return UNARGS_ERR_ARGS;
+    }
 
-    return 0;
+    return UNARGS_OK;
 }
 
 void unargs__printDef(const unargs_Param *param) {
@@ -901,12 +935,16 @@ void unargs__printOptions(int len, const unargs_Param *params) {
     }
 }
 
-void unargs_help(const char *program, int len, const unargs_Param *params) {
+unargs_Status unargs_help(
+    const char *program,
+    int len, const unargs_Param *params) {
     unargs__verifyParams(len, params);
 
     unargs__printUsage(program, len, params);
     unargs__printPositionals(len, params);
     unargs__printOptions(len, params);
+
+    return UNARGS_OK;
 }
 
 #endif // UNARGS_IMPLEMENTATION
