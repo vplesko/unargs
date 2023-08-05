@@ -2,9 +2,9 @@
 
 This is a single-header library for parsing `argv`, written in C.
 
-I mainly created it for my own needs. It does NOT attempt to follow Unix or any other convention, hence the name (<u>un</u>conventional <u>arg</u>ument<u>s</u>).
+I mainly created it for my own needs. It does NOT attempt to follow Unix or any other convention, hence the name (*un*conventional *arg*ument*s*).
 
-<u>**Please do not send any pull requests to this repository.**</u>
+**Please do not send any pull requests to this repository.**
 
 ## Syntax
 
