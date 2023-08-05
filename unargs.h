@@ -1076,7 +1076,9 @@ void unargs__printUsage(
             break;
         }
     }
-    if (hasNonReqPos) UNARGS_PRINT_OUT_STR(" [positionals]");
+    if (hasNonReqPos) {
+        UNARGS_PRINT_OUT_STR(" [positionals]");
+    }
 
     bool hasNonReqOpt = false;
     for (int i = 0; i < len; ++i) {
@@ -1087,7 +1089,9 @@ void unargs__printUsage(
             break;
         }
     }
-    if (hasNonReqOpt) UNARGS_PRINT_OUT_STR(" [options]");
+    if (hasNonReqOpt) {
+        UNARGS_PRINT_OUT_STR(" [options]");
+    }
 
     UNARGS_PRINT_OUT_LN();
 }
