@@ -4,7 +4,7 @@ CXX = clang++
 BIN_DIR = bin
 
 BUILD_FLAGS = -std=c99 -Wall -Wextra -Wconversion -pedantic -Werror -I./ -O0 -g -fno-omit-frame-pointer
-BUILD_FLAGS_CXX = -std=c++98 -Wall -Wextra -Wconversion -pedantic -Werror -I./ -O0 -g -fno-omit-frame-pointer
+BUILD_FLAGS_CXX = -std=c++11 -Wall -Wextra -Wconversion -pedantic -Werror -I./ -O0 -g -fno-omit-frame-pointer
 ifdef VC
 	BUILD_FLAGS += -D_CRT_SECURE_NO_WARNINGS
 	BUILD_FLAGS_CXX += -D_CRT_SECURE_NO_WARNINGS
