@@ -68,6 +68,6 @@ This is a single-header library. The header file is `unargs.h`, simply copy it s
 
 You can include it in other translation units by omitting `#define UNARGS_IMPLEMENTATION`.
 
-The library should compile on C99, C++98, or any newer standard.
+The library should compile on C99, C++11, or any newer standard.
 
 You can run `make` from this project's directory to run various tests to make sure the library works correctly.
