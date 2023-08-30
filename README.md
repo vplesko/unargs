@@ -32,7 +32,7 @@ Parameters can be required or non-required (in which case they have a default va
 
 Example usage:
 
-```
+```c
     unargs_Param params[] = {
         // required int option '-opt1'
         unargs_intReq("opt1", "Description of opt1.", &opt1),
@@ -61,7 +61,7 @@ Example usage:
 
 This is a single-header library. The header file is `unargs.h`, simply copy it somewhere within your project directory and include it in ONE translation unit with:
 
-```
+```c
     #define UNARGS_IMPLEMENTATION
     #include "unargs.h"
 ```
